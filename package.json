@@ -24,6 +24,7 @@
     "wrangler": "4.86.0"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
     "proj4": "^2.22.0"
   }
 }
