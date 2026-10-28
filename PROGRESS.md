@@ -2,7 +2,9 @@
 
 **Current step:** 1 — Setup batch
 **Next step:** 2 — Scaffold
-**Last verified healthy:** — (no code yet)
+**Last verified healthy:** — (no code yet; no package.json, so `npm test` / `npm run build` not applicable)
+
+**Waiting on (step 1, user):** remote repo had no commits and no branches before the planning files were pushed. Still missing from the repo: `public/model/` (v2 export), `reference/build_dataset.py`, `fixtures/test_tiles/` (+ `manifest.json`, optional eval.js CSV), `reference/amazon-limit/`; `main` and `build` branches; Cloudflare Pages project name; confirmation the CDSE secret was rotated.
 
 ## Checklist
 
@@ -50,4 +52,5 @@
 - 2026-10-28: Known caveats kept in the UI: haze can slip past the cloud mask; natural savannas read as Not Forest.
 - 2026-10-28: Single Opus session, no parallel subagents; one fresh review subagent per milestone.
 - 2026-10-28: Cloud runs use MOCK mode only; every live CDSE call happens in `[local]` steps.
+- 2026-10-28: Session reconcile: git log = planning-files commit only; working tree has no code or user-supplied files. PROGRESS.md status (step 1 open) confirmed correct; run stopped at ⏸️ step 1.
 - 2026-10-28: Plain JS + Vite (no framework, no TypeScript) chosen for simplicity; change via a spec-change step before step 2 if wanted.
