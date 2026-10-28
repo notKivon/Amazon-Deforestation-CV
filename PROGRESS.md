@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 9 — Report section
-**Next step:** 10 — What the model sees
-**Last verified healthy:** 2026-10-28 after step 8 — `npm test` 119/119, `npm run build` OK, Chromium smoke check at 1280 and 375 px (no console errors, no horizontal scroll)
+**Current step:** 10 — What the model sees
+**Next step:** 11 — Polish
+**Last verified healthy:** 2026-10-28 after step 9 — `npm test` 123/123, `npm run build` OK, end-to-end MOCK run in headless Chromium via `wrangler dev` (2×2 tiles, 10 years, 25 s, no console errors)
 
 ## Checklist
 
@@ -26,7 +26,7 @@
 
 ### M4 — Interface (cloud)
 - [x] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
-- [ ] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
+- [x] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
 - [ ] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
 - [ ] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
 - [ ] M4 review.
@@ -87,3 +87,7 @@
 - 2026-10-28: `initBackend()` (caller runs it before `loadModel`) skips WebGL when `WEBGL_RENDER_FLOAT32_CAPABLE` is false, to keep probabilities near 0.5 faithful.
 - 2026-10-28: UI split: `ui/controls.js` (size select, zone label, Run, outside message) is separate from `ui/map.js` (Leaflet only), so the hard-limit behaviour is jsdom-testable. Outside the outline is dimmed with a world polygon that has the Amazon as a hole. The area square is yellow when inside, red when outside. A centre dot (circleMarker) avoids Leaflet's marker-icon asset paths under Vite.
 - 2026-10-28: Nominatim from the browser: submit-only, ≥ 1 s between requests (extra submits get a "wait" message), results greyed and disabled when `pointInAmazon` is false. No email or extra identifying parameters are sent.
+- 2026-10-28: TensorFlow.js (1.6 MB chunk), the model, and Chart.js load lazily on the first Run; the first page load is ~115 KB gzipped JS. The model loads in parallel with the imagery fetch.
+- 2026-10-28: Only reported years are classified (too-cloudy years are skipped entirely), which saves model time.
+- 2026-10-28: Report view draws the scene into a canvas at native resolution, scaled by CSS (smooth, not pixelated). Valid tiles get a coloured border (green Forest, crimson Not Forest), invalid tiles a dark hatch, loss ▼ and burn 🔥 markers; a legend explains each. The map shows the same grid for the slider's year (filled; invalid tiles dashed grey; tooltips describe each tile).
+- 2026-10-28: Image date range shown under the slider is the window used (base or extended), from `windowFor`, formatted in UTC.
