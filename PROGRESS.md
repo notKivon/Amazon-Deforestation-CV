@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 2 — Scaffold
-**Next step:** 3 — Geometry, seasons/years and Amazon outline
-**Last verified healthy:** — (no code yet; no package.json, so `npm test` / `npm run build` not applicable)
+**Current step:** 3 — Geometry, seasons/years and Amazon outline
+**Next step:** M1 review
+**Last verified healthy:** 2026-10-28 after step 2 — `npm test` 5/5, `npm run build` OK, `wrangler deploy --dry-run` OK, secret grep clean
 
 ## Checklist
 
@@ -10,7 +10,7 @@
 - [x] 1. ⏸️ **Setup batch.** User does everything in SPEC.md → "External service setup": rotate CDSE secret; create GitHub repo + `build` branch; add `public/model/`, `reference/build_dataset.py`, `fixtures/test_tiles/`, `reference/amazon-limit/` (Amazon biome boundary file); create the Cloudflare Worker (Workers Builds from Git) with the two Secrets; create the Claude Code cloud environment. Report back: repo `owner/name`, Worker name, and whether the eval.js predictions CSV was included. Agent then fills Project values in CLAUDE.md (planning-only commit).
 
 ### M1 — Foundation (cloud)
-- [ ] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
+- [x] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
 - [ ] 3. Geometry, seasons/years and Amazon outline: `grid.js`, `season.js`, `years.js`, `region.js`, `scripts/build-outline.mjs` → commit generated `public/data/amazon-biome.geojson`; unit tests (SPEC.md → Geometry, Seasons and years, Amazon outline). Blocker if `reference/amazon-limit/` is missing.
 - [ ] M1 review: fresh review subagent; summary here.
 
@@ -57,3 +57,7 @@
 - 2026-10-28: Plain JS + Vite (no framework, no TypeScript) chosen for simplicity; change via a spec-change step before step 2 if wanted.
 - 2026-10-28: Hosting switched from Pages to a Worker with static assets, since Cloudflare created the project as a Worker. Cache API is a no-op on workers.dev.
 - 2026-10-28: Step 1 done (user report): CDSE OAuth client rotated (old client deleted); new values stored as encrypted Secrets `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` on Worker `amazon-deforestation-cv`; Workers Builds connected to this repo, deploying from `main`; cloud environment runs on `build`. eval.js predictions CSV included (`fixtures/test_tiles/model_v2_predictions.csv`).
+- 2026-10-28: Wrangler pinned to exactly 4.86.0: it is the last 4.x release that runs on Node 20 (4.87.0+ require Node ≥ 22 because Node 20 reached end-of-life on 2026-04-30). Still the current major, so it fits both "current Wrangler major" and `.node-version` = 20. `compatibility_date` = 2026-04-26, the newest its bundled workerd supports. Recommend moving to Node 22 + latest Wrangler (needs the user's OK, since Node 20 is in the spec).
+- 2026-10-28: jsdom pinned to ^26.1.0 (jsdom 27+ need Node ≥ 20.19 / 22.12, and 30 needs Node 22.22). Vitest 3.2 runs with Vite 5.
+- 2026-10-28: `npm audit` reports advisories only in dev tooling (esbuild dev server, vitest/tinypool, sharp via miniflare). None of it ships in `dist/` or the Worker bundle; left as is.
+- 2026-10-28: Tests live in `tests/*.test.js`; Node environment by default, DOM tests opt in with `// @vitest-environment jsdom`. `.dev.vars.example` (names only, no values) documents the local file.

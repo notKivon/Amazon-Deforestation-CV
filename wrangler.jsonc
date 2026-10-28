@@ -1,0 +1,14 @@
+// Worker with static assets. Secrets (CDSE_CLIENT_ID, CDSE_CLIENT_SECRET) are
+// Worker Secrets in the dashboard and `.dev.vars` locally. No `vars` block, ever.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "amazon-deforestation-cv",
+  "main": "worker/index.js",
+  // Latest date supported by the pinned wrangler 4.86.0 (last release that runs on Node 20).
+  "compatibility_date": "2026-04-26",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  }
+}

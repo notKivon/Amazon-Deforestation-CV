@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+.wrangler-dry/
+*.log
+.DS_Store

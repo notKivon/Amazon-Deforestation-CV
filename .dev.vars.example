@@ -1,0 +1,5 @@
+# Copy to .dev.vars (gitignored) for `npm run dev:full`. Never commit real values.
+# Live runs: set both CDSE values. Mock runs: set MOCK=1 and leave the CDSE lines out.
+CDSE_CLIENT_ID=
+CDSE_CLIENT_SECRET=
+MOCK=1
