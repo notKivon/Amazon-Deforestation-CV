@@ -1,9 +1,11 @@
 // Cloudflare Cache API wrapper. A no-op on *.workers.dev; works on a custom domain.
 // Every call fails silently so caching can never break a response.
 export const CACHE_CONTROL = 'public, max-age=2592000';
+// Bump when an evalscript or the request shape changes, so stale images are never served.
+export const CACHE_VERSION = 'v1';
 
 export function cacheKey({ product, window, lon, lat, tilesPerSide, year }) {
-  const id = `imagery:${product}:${window}:${lon.toFixed(5)}:${lat.toFixed(5)}:${tilesPerSide}:${year}`;
+  const id = `imagery:${CACHE_VERSION}:${product}:${window}:${lon.toFixed(5)}:${lat.toFixed(5)}:${tilesPerSide}:${year}`;
   return new Request(`https://imagery-cache.invalid/${encodeURIComponent(id)}`);
 }
 

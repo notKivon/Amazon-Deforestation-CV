@@ -136,7 +136,39 @@ describe('errors', () => {
   });
 });
 
+describe('after a failure', () => {
+  it('the same client still completes a later run (no leaked limiter slots)', async () => {
+    let fail = true;
+    const s = mockServer();
+    const fetchImpl = (url, init) =>
+      fail ? Promise.resolve(new Response('{"error":"upstream_error"}', { status: 502 })) : s.fetchImpl(url, init);
+    const client = createClient({ fetchImpl, decode });
+    const err = await client.fetchYears({ area: AREA, grid: GRID, years: [2017, 2018, 2019, 2020, 2021, 2022] }).catch((e) => e);
+    expect(err.code).toBe('upstream_error');
+    fail = false;
+    const [r] = await client.fetchYears({ area: AREA, grid: GRID, years: [2024] });
+    expect(r.year).toBe(2024);
+  });
+
+  it('a run aborted by the caller frees its slots too', async () => {
+    const s = mockServer();
+    const client = createClient({ fetchImpl: s.fetchImpl, decode });
+    const ctrl = new AbortController();
+    ctrl.abort();
+    const err = await client.fetchYears({ area: AREA, grid: GRID, years: [2017, 2018, 2019, 2020], signal: ctrl.signal }).catch((e) => e);
+    expect(err.name).toBe('AbortError');
+    const [r] = await client.fetchYears({ area: AREA, grid: GRID, years: [2024] });
+    expect(r.window).toBe('base');
+  });
+});
+
 describe('createLimiter', () => {
+  it('frees the slot when a task throws synchronously', async () => {
+    const limit = createLimiter(1);
+    await expect(limit(() => { throw new Error('sync'); })).rejects.toThrow('sync');
+    await expect(limit(async () => 'ok')).resolves.toBe('ok');
+  });
+
   it('runs tasks in order with a cap', async () => {
     const limit = createLimiter(2);
     let active = 0, peak = 0;

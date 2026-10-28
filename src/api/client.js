@@ -20,7 +20,8 @@ export function createLimiter(max) {
     if (active >= max || !queue.length) return;
     active++;
     const { task, resolve, reject } = queue.shift();
-    task().then(resolve, reject).finally(() => { active--; next(); });
+    // Promise.resolve().then(task) turns a synchronous throw into a rejection, so the slot is always freed.
+    Promise.resolve().then(task).then(resolve, reject).finally(() => { active--; next(); });
   };
   return (task) => new Promise((resolve, reject) => { queue.push({ task, resolve, reject }); next(); });
 }

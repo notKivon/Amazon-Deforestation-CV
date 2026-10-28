@@ -1,7 +1,7 @@
 // Copernicus proxy for POST /api/imagery → PNG for one product, year, and window.
 import { areaBox, areaInsideAmazon, windowFor, zoneFor } from '../shared/geo.js';
 import { EVALSCRIPTS } from '../shared/evalscripts.js';
-import { validateBody } from './validate.js';
+import { validateBody, MAX_BODY } from './validate.js';
 import { buildProcessRequest, fetchImage, UpstreamError } from './cdse.js';
 import { cacheKey, cacheGet, cachePut, CACHE_CONTROL } from './cache.js';
 import { mockPng, mockSeed } from './mock.js';
@@ -15,6 +15,8 @@ function png(bytes, cacheControl) {
 }
 
 export async function handleImagery(request, env = {}, ctx) {
+  const declared = Number(request.headers.get('Content-Length'));
+  if (declared > MAX_BODY) return json(400, { error: 'body_too_large' });
   const check = validateBody(await request.text());
   if (!check.ok) return json(400, { error: check.error });
   const q = check.value;

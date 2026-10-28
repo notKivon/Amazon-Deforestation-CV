@@ -12,13 +12,20 @@ export class UpstreamError extends Error {
 }
 
 let cached = null; // { token, expiresAt }
+let pending = null; // shared in-flight token request
 
 export function resetTokenCache() {
   cached = null;
+  pending = null;
 }
 
 export async function getToken(env) {
   if (cached && Date.now() < cached.expiresAt) return cached.token;
+  if (!pending) pending = requestToken(env).finally(() => { pending = null; });
+  return pending;
+}
+
+async function requestToken(env) {
   let res;
   try {
     res = await fetch(TOKEN_URL, {

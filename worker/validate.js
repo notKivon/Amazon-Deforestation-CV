@@ -5,7 +5,7 @@ import { availableYears, zoneFor, MIN_TILES_PER_SIDE, MAX_TILES_PER_SIDE } from 
 export const PRODUCTS = ['truecolor', 'falsecolor', 'nbr'];
 export const WINDOWS = ['base', 'extended'];
 const FIELDS = ['lon', 'lat', 'tilesPerSide', 'year', 'product', 'window'];
-const MAX_BODY = 1024;
+export const MAX_BODY = 1024;
 
 const round5 = (v) => Math.round(v * 1e5) / 1e5;
 

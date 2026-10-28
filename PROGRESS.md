@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** M2 review
-**Next step:** 6 — Model
-**Last verified healthy:** 2026-10-28 after step 5 — `npm test` 88/88, `npm run build` OK
+**Current step:** 6 — Model
+**Next step:** 7 — Analysis
+**Last verified healthy:** 2026-10-28 after M2 review — `npm test` 93/93, `npm run build` OK
 
 ## Checklist
 
@@ -17,7 +17,7 @@
 ### M2 — Data pipeline (cloud)
 - [x] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
 - [x] 5. Client fetch + PNG decode with base → extended fallback, concurrency limit and progress callback; tests for the three fallback cases against MOCK responses.
-- [ ] M2 review.
+- [x] M2 review.
 
 ### M3 — Model and analysis (cloud)  ∥B
 - [ ] 6. ∥B (files: `src/model/*`, model tests) Model load, preprocessing, tile slicing, batch classify; parity test on `fixtures/test_tiles/` (≥ 140/143).
@@ -39,6 +39,8 @@
 ## Milestone summaries
 <!-- one short paragraph per milestone, written by the run -->
 **M1 — Foundation (2026-10-28).** Scaffolded a Worker with static assets (`wrangler.jsonc`, `worker/index.js` routing, stub proxy), Vite 5, Vitest 3 + jsdom, and the cloud setup hook. Built UTM geometry, dry-season windows, available years, and the RAISG Amazon outline (1,999 vertices) with the centre + corners hard-limit check. Review confirmed all core rules (windows, 2.0° boundary, year cutoffs, EPSG, 10 m snapping, corners) and found no bugs; fixed its hardening items (`areaBox` rejects bad sizes/coordinates, `zoneFor` rejects non-numbers, outline script now counts features before dissolving). One review finding (stale Pages wording in CLAUDE.md) was a false positive — the reviewer read a pre-edit copy. Open: the outline ships twice (static file at the spec path + inlined in JS, 42 KB); Node 20 compatibility is untested here (the sandbox has Node 22).
+
+**M2 — Data pipeline (2026-10-28).** Built the three evalscripts (falsecolor bit-exact with the training `to_rgb` chain), the `/api/imagery` Worker proxy (strict validation, server-side Amazon check and dates, shared CDSE token cache, versioned silent Cache API, 502 mapping, procedural MOCK mode checked in workerd), and the client (nbr-first fetch, base → extended fallback, 3-request limiter, abort on first failure). Review confirmed the falsecolor chain, request shape, validation, and secrets handling. It found one real bug — the limiter leaked slots and hung later runs after any failure or abort — now fixed with regression tests. Also fixed: cache key versioned (`v1`), concurrent cold requests share one token request, and a `Content-Length` pre-check. Still open: Sentinel Hub float → UINT16 rounding (±1 DN at most), checked live in step 12.
 
 ## Decisions & gotchas
 - 2026-10-28: Amazon outline = RAISG Biomes 2025, Amazonía feature only (excludes Cerrado and Andes), rather than the broader RAISG Limits layer. Credit RAISG in the map attribution and model info panel.

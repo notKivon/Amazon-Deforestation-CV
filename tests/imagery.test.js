@@ -57,6 +57,7 @@ describe('validation', () => {
     [{ ...MANAUS, year: '2024' }, 'invalid_year'],
     [{ ...MANAUS, lon: -47.88, lat: -15.79 }, 'outside_amazon'],
     ['x'.repeat(2000), 'body_too_large'],
+    [JSON.stringify(MANAUS).padEnd(1100, ' '), 'body_too_large'],
   ];
   for (const [body, error] of cases) {
     it(`400 ${error}`, async () => {
@@ -136,6 +137,13 @@ describe('token cache', () => {
     expect(tokenCalls(f)).toBe(2);
   });
 
+  it('shares one token request between concurrent cold requests', async () => {
+    const f = mockFetch();
+    vi.stubGlobal('fetch', f);
+    await Promise.all([1, 2, 3].map(() => handleImagery(post(MANAUS), ENV)));
+    expect(tokenCalls(f)).toBe(1);
+  });
+
   it('sends client credentials as a form body', async () => {
     const f = mockFetch();
     vi.stubGlobal('fetch', f);
@@ -193,7 +201,7 @@ describe('Cache API', () => {
     const res = await handleImagery(post(MANAUS), ENV);
     expect(await res.text()).toBe('cached');
     expect(f).not.toHaveBeenCalled();
-    expect(decodeURIComponent(match.mock.calls[0][0].url)).toContain('imagery:falsecolor:base:-60.02000:-3.10000:4:2024');
+    expect(decodeURIComponent(match.mock.calls[0][0].url)).toContain('imagery:v1:falsecolor:base:-60.02000:-3.10000:4:2024');
   });
 
   it('stores misses via waitUntil', async () => {
