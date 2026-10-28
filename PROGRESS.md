@@ -1,15 +1,13 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 1 — Setup batch
-**Next step:** 2 — Scaffold
+**Current step:** 2 — Scaffold
+**Next step:** 3 — Geometry, seasons/years and Amazon outline
 **Last verified healthy:** — (no code yet; no package.json, so `npm test` / `npm run build` not applicable)
-
-**Waiting on (step 1, user):** Cloudflare Worker + `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` secrets and its project name; confirmation the CDSE secret was rotated; Claude Code cloud environment pointed at `build`. Done 2026-10-28: `public/model/`, `reference/build_dataset.py` (+ `build_dataset_128.py`, dataset README), `fixtures/test_tiles/` (143 tiles, manifest, v2 + v1 prediction CSVs), `main` and `build` branches, `reference/amazon-limit/raisg_biomes_2025.zip` (RAISG Biomes 2025).
 
 ## Checklist
 
 ### M0 — Setup (user)
-- [ ] 1. ⏸️ **Setup batch.** User does everything in SPEC.md → "External service setup": rotate CDSE secret; create GitHub repo + `build` branch; add `public/model/`, `reference/build_dataset.py`, `fixtures/test_tiles/`, `reference/amazon-limit/` (Amazon biome boundary file); create the Cloudflare Worker (Workers Builds from Git) with the two Secrets; create the Claude Code cloud environment. Report back: repo `owner/name`, Worker name, and whether the eval.js predictions CSV was included. Agent then fills Project values in CLAUDE.md (planning-only commit).
+- [x] 1. ⏸️ **Setup batch.** User does everything in SPEC.md → "External service setup": rotate CDSE secret; create GitHub repo + `build` branch; add `public/model/`, `reference/build_dataset.py`, `fixtures/test_tiles/`, `reference/amazon-limit/` (Amazon biome boundary file); create the Cloudflare Worker (Workers Builds from Git) with the two Secrets; create the Claude Code cloud environment. Report back: repo `owner/name`, Worker name, and whether the eval.js predictions CSV was included. Agent then fills Project values in CLAUDE.md (planning-only commit).
 
 ### M1 — Foundation (cloud)
 - [ ] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
@@ -58,3 +56,4 @@
 - 2026-10-28: Session reconcile: git log = planning-files commit only; working tree has no code or user-supplied files. PROGRESS.md status (step 1 open) confirmed correct; run stopped at ⏸️ step 1.
 - 2026-10-28: Plain JS + Vite (no framework, no TypeScript) chosen for simplicity; change via a spec-change step before step 2 if wanted.
 - 2026-10-28: Hosting switched from Pages to a Worker with static assets, since Cloudflare created the project as a Worker. Cache API is a no-op on workers.dev.
+- 2026-10-28: Step 1 done (user report): CDSE OAuth client rotated (old client deleted); new values stored as encrypted Secrets `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` on Worker `amazon-deforestation-cv`; Workers Builds connected to this repo, deploying from `main`; cloud environment runs on `build`. eval.js predictions CSV included (`fixtures/test_tiles/model_v2_predictions.csv`).
