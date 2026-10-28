@@ -106,3 +106,6 @@ button.run { background: var(--accent); color: var(--accent-ink); font-weight: 6
 button.secondary { font-size: 0.88rem; padding: 6px 10px; }
 button.cancel { border-color: var(--error); color: var(--error); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.swatch-dashed { border-style: dashed; }
+.stale-note { padding: 8px 10px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); }
+section.stale .scene, section.stale .chart-box { opacity: 0.6; }

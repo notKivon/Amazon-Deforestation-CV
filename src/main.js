@@ -13,8 +13,9 @@ import { createMap } from './ui/map.js';
 import { createSearch } from './ui/search.js';
 import { createControls } from './ui/controls.js';
 import { createStatus, errorMessage } from './ui/status.js';
+import { h } from './ui/dom.js';
 
-const state = { centre: null, box: null, inside: false, busy: false, result: null, view: null };
+const state = { centre: null, box: null, inside: false, busy: false, result: null, view: null, stale: false };
 const client = createClient();
 
 // TensorFlow.js is large: load it (and the model) only when the first run starts.
@@ -38,7 +39,7 @@ const controls = createControls(panel, {
   onRun: () => run(),
   onCancel: () => state.abort?.abort(),
   onUseMapCentre: () => {
-    const c = mapView.map.getCenter();
+    const c = mapView.map.getCenter().wrap();
     select({ lon: c.lng, lat: c.lat }, false);
   },
 });
@@ -46,6 +47,7 @@ const status = createStatus(panel);
 const mapView = createMap(document.getElementById('map'), { onSelect: (p) => select(p, false) });
 
 function select(point, fly) {
+  if (state.busy) return; // the area can't change mid-run (Cancel first)
   state.centre = point;
   refresh();
   // Zoom to the area for search results, or for a click made while zoomed far out.
@@ -59,14 +61,33 @@ function refresh() {
   state.inside = areaInsideAmazon(state.box);
   mapView.setArea(state.centre, boxCornersLatLon(state.box), state.inside);
   controls.setSelection(state.centre, state.inside, state.busy);
-  status.clear();
+  if (!state.busy) status.clear();
+  const a = state.result?.area;
+  if (a && (a.lon !== lon || a.lat !== lat || a.tilesPerSide !== controls.tilesPerSide)) setStale(true);
+}
+
+// Results stay visible after the selection changes, but are marked as belonging to the
+// previous area and no longer drawn on the map.
+function setStale(stale) {
+  state.stale = stale;
+  for (const id of ['report', 'model-view']) {
+    const section = document.getElementById(id);
+    section.classList.toggle('stale', stale);
+    const note = section.querySelector('.stale-note');
+    if (!stale) note?.remove();
+    else if (!note) {
+      section.querySelector('h2')?.after(h('p', { class: 'stale-note', role: 'status' },
+        'These results are for the previous area. Run the analysis again for the new selection.'));
+    }
+  }
 }
 
 function showOnMap(grid, yearReport) {
   mapView.setGrid(grid.map((t, i) => {
     const tile = yearReport.reported ? yearReport.tiles[i] : null;
     const style = tile?.valid
-      ? { color: TILE_COLOURS[tile.cls], fillColor: TILE_COLOURS[tile.cls], fillOpacity: 0.25, weight: tile.loss ? 3 : 1 }
+      ? { color: TILE_COLOURS[tile.cls], fillColor: TILE_COLOURS[tile.cls], fillOpacity: 0.25, weight: tile.loss ? 3 : 1.5,
+          dashArray: tile.cls === 'forest' ? null : '6 4' }
       : { color: '#888', fillColor: '#555', fillOpacity: 0.35, dashArray: '4 4', weight: 1 };
     return { cornersLatLon: t.cornersLatLon, style, title: `${yearReport.year}: ${describeTile(tile)}` };
   }));
@@ -98,11 +119,12 @@ async function run() {
       },
     });
     state.result = { report, scenes, grid, zone, area };
+    setStale(false);
     state.view?.destroy();
     const modelView = renderModelView(document.getElementById('model-view'), state.result);
     state.view = renderReport(document.getElementById('report'), state.result, {
       createChart: (canvas, r) => import('./ui/chart.js').then((m) => m.createChart(canvas, r)),
-      onYearChange: (i) => { showOnMap(grid, report[i]); modelView.setYear(i); },
+      onYearChange: (i) => { if (!state.stale) showOnMap(grid, report[i]); modelView.setYear(i); },
     });
     const reportedYears = report.filter((r) => r.reported).length;
     if (!reportedYears) status.show('warning', 'Every year was too cloudy for this area. Try a nearby spot.');

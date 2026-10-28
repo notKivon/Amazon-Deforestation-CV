@@ -4,6 +4,7 @@ import { createControls, sizeLabel } from '../src/ui/controls.js';
 import { createSearch } from '../src/ui/search.js';
 import { createStatus, errorMessage, OUTSIDE_AMAZON } from '../src/ui/status.js';
 import { createMap, ATTRIBUTION } from '../src/ui/map.js';
+import L from 'leaflet';
 import { areaBox, boxCornersLatLon } from '../src/geo/grid.js';
 
 beforeEach(() => { document.body.innerHTML = ''; });
@@ -87,6 +88,15 @@ describe('search', () => {
     expect(document.body.textContent).toMatch(/Search © OpenStreetMap contributors/);
   });
 
+  it('copes with a result that has no display_name', async () => {
+    const onChoose = vi.fn();
+    const s = createSearch(document.body, { fetchImpl: async () => Response.json([{ lon: '-60.02', lat: '-3.1' }]), onChoose });
+    s.input.value = 'x';
+    await s.run();
+    document.querySelector('.search-results button').click();
+    expect(onChoose).toHaveBeenCalledWith({ lon: -60.02, lat: -3.1, name: 'Unnamed place' });
+  });
+
   it('allows at most one request per second', async () => {
     let t = 10_000;
     const fetchImpl = vi.fn(async () => Response.json([]));
@@ -125,7 +135,7 @@ describe('status', () => {
   it('maps codes to readable text', () => {
     expect(errorMessage({ code: 'network' })).toMatch(/connection/);
     expect(errorMessage({ code: 'http_503' })).toMatch(/503/);
-    expect(errorMessage(new Error('boom'))).toBe('boom');
+    expect(errorMessage(new Error('Cannot read properties of undefined'))).toBe('Something went wrong. Please try again.');
     expect(errorMessage(new DOMException('Aborted', 'AbortError'))).toBe('Cancelled.');
     expect(errorMessage({ code: 'model_load' })).toMatch(/model could not be loaded/);
   });
@@ -139,8 +149,11 @@ describe('map', () => {
     const m = createMap(el, { onSelect });
     expect(ATTRIBUTION).toMatch(/OpenStreetMap/);
     expect(ATTRIBUTION).toMatch(/Amazon boundary © <a [^>]+>RAISG<\/a> 2025|Amazon boundary &copy; <a [^>]+>RAISG<\/a> 2025/);
-    m.map.fire('click', { latlng: { lat: -3.1, lng: -60.02 } });
-    expect(onSelect).toHaveBeenCalledWith({ lon: -60.02, lat: -3.1 });
+    m.map.fire('click', { latlng: L.latLng(-3.1, -60.02) });
+    expect(onSelect.mock.calls[0][0].lon).toBeCloseTo(-60.02, 9);
+    expect(onSelect.mock.calls[0][0].lat).toBe(-3.1);
+    m.map.fire('click', { latlng: L.latLng(-3.1, -420.02) }); // a repeated world copy
+    expect(onSelect.mock.calls[1][0].lon).toBeCloseTo(-60.02, 6);
     const box = areaBox(-60.02, -3.1, 4);
     expect(() => m.setArea({ lon: -60.02, lat: -3.1 }, boxCornersLatLon(box), true)).not.toThrow();
   });

@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** M4 review
-**Next step:** 12 — `[local]` live verification
-**Last verified healthy:** 2026-10-28 after step 11 — `npm test` 129/129, `npm run build` OK; Chromium MOCK runs via `wrangler dev` at 1280 and 375 px (no console errors, no horizontal scroll), cancel + rerun OK
+**Current step:** 12 — `[local]` live verification (cloud run stopped here: needs `.dev.vars` with real CDSE credentials and the user's machine)
+**Next step:** 13 — `[local]` deploy
+**Last verified healthy:** 2026-10-28 after M4 review — `npm test` 132/132, `npm run build` OK, secret grep clean on `dist/` and `.wrangler-dry/` (binding names only), Chromium MOCK runs OK
 
 ## Checklist
 
@@ -29,7 +29,7 @@
 - [x] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
 - [x] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
 - [x] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
-- [ ] M4 review.
+- [x] M4 review.
 
 ### M5 — Live verification and launch (local)
 - [ ] 12. `[local]` Create `.dev.vars` (user pastes values), run `npm run dev:full`, run every acceptance check in SPEC.md → Verification (incl. north zone, outside rejection and a real fallback year), check the falsecolor tiles visually match training tiles, fix bugs (each fix a tested commit), write `docs/verification.md`.
@@ -43,6 +43,8 @@
 **M2 — Data pipeline (2026-10-28).** Built the three evalscripts (falsecolor bit-exact with the training `to_rgb` chain), the `/api/imagery` Worker proxy (strict validation, server-side Amazon check and dates, shared CDSE token cache, versioned silent Cache API, 502 mapping, procedural MOCK mode checked in workerd), and the client (nbr-first fetch, base → extended fallback, 3-request limiter, abort on first failure). Review confirmed the falsecolor chain, request shape, validation, and secrets handling. It found one real bug — the limiter leaked slots and hung later runs after any failure or abort — now fixed with regression tests. Also fixed: cache key versioned (`v1`), concurrent cold requests share one token request, and a `Content-Length` pre-check. Still open: Sentinel Hub float → UINT16 rounding (±1 DN at most), checked live in step 12.
 
 **M3 — Model and analysis (2026-10-28).** Model pipeline (labels by name, TM preprocessing, batch 16, valid tiles only) reproduces eval.js on the 143 held-out tiles: 141/143 correct, 143/143 agreement, probabilities within 0.001 — after finding empirically that eval.js resized with `alignCorners = true`. Analysis implements validity, cover %, loss and dNBR against the previous valid reported year, and burn flags. The review found no blocking bugs. Fixed: a true dNBR of 0.27 could compute as 0.27000000000000002 and be flagged (now compared with a 1e-9 margin, tested over all 255 encodings); tensors disposed on error (leak test added); a valid but unclassified tile now throws; clear metadata.json load error; WebGL without float32 falls back to CPU; scene-size check in `classifyScene`.
+
+**M4 — Interface (2026-10-28).** Built the map (RAISG outline, outside dimmed, hard limit with red square + disabled Run + exact message), Nominatim search (outside results greyed), zone/window label, report (chart with gaps and hollow extended-window points, year slider, true-colour view with grid and ▼/🔥 markers, dates, counts table), "What the model sees" (false-colour view, keyboard-reachable tile inspector with 4× crops and probability bars, model info, Known limitations tested word for word against CLAUDE.md), and polish (cancel, keyboard centre selection, readable errors). Checked end to end in headless Chromium against `wrangler dev` MOCK at 1280 and 375 px; the browser model path matches eval.js on 21/21 test tiles. The review found one real bug, now fixed: changing the selection after or during a run left a stale grid on the map and could hide the loading banner. Now mid-run selections are ignored, and old results are marked "for the previous area" and no longer drawn on the map. Also fixed: late-arriving chart destroyed and chart-load failure shown; generic text for unexpected errors; Not Forest tiles dashed as well as coloured; loss marks outlined; map clicks on wrapped world copies normalised; search results without a name handled.
 
 ## Decisions & gotchas
 - 2026-10-28: Amazon outline = RAISG Biomes 2025, Amazonía feature only (excludes Cerrado and Andes), rather than the broader RAISG Limits layer. Credit RAISG in the map attribution and model info panel.
@@ -96,3 +98,5 @@
 - 2026-10-28: Browser-path parity: in headless Chromium, `decode.js` (createImageBitmap) + `classifyScene` on 21 of the held-out tiles matched eval.js on 21/21 classes, max probability error 0.000004 (CPU backend; headless SwiftShader has no float32 WebGL, so `initBackend` fell back as designed). WebGL on a real GPU is checked in step 12.
 - 2026-10-28: Polish: Cancel button aborts a run (status "Cancelled.", and the next run works); "Choose the map centre" button gives keyboard users a way to select (Leaflet arrow-key panning + button); "Loading the forest model…" phase; model load failure → readable `model_load` message; year slider `aria-valuetext`; smooth scroll respects reduced motion.
 - 2026-10-28: Mock scenes are flat synthetic colours, far outside the training data, so the model's verdicts on them mean nothing (it calls some mostly-pink mock tiles Forest). Model correctness is covered by the two parity checks, and real imagery by step 12.
+- 2026-10-28: Selection is frozen during a run (Cancel first). After a run, changing the centre or size keeps the results visible with a "previous area" note and stops drawing their grid on the map.
+- 2026-10-28: Not Forest tiles are dashed (canvas and map) as well as crimson, so Forest / Not Forest doesn't rely on red/green alone. Unexpected errors show a generic sentence; details go to the console.

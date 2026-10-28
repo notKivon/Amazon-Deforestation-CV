@@ -29,7 +29,10 @@ export function createMap(el, { onSelect = () => {} } = {}) {
   let area = null, centre = null;
   const gridLayer = L.layerGroup().addTo(map);
 
-  map.on('click', (e) => onSelect({ lon: e.latlng.lng, lat: e.latlng.lat }));
+  map.on('click', (e) => {
+    const ll = e.latlng.wrap(); // clicks on a repeated world copy → −180…180
+    onSelect({ lon: ll.lng, lat: ll.lat });
+  });
 
   return {
     map,

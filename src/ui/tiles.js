@@ -41,11 +41,17 @@ export function drawScene(canvas, image, grid, yearReport, opts = {}) {
       ctx.fillRect(x, y, TILE_PX, TILE_PX);
       if (pattern) { ctx.fillStyle = pattern; ctx.fillRect(x, y, TILE_PX, TILE_PX); }
     } else {
+      // Not Forest is dashed as well as coloured, so the classes don't rely on colour alone.
       ctx.strokeStyle = TILE_COLOURS[tile.cls];
       ctx.lineWidth = 6;
+      ctx.setLineDash(tile.cls === 'forest' ? [] : [14, 8]);
       ctx.strokeRect(x + 3, y + 3, TILE_PX - 6, TILE_PX - 6);
-      if (tile.loss) { ctx.fillStyle = '#fff'; ctx.fillText(LOSS_MARK, x + 10, y + 10); }
-      if (tile.burn) ctx.fillText(BURN_MARK, x + TILE_PX - 36, y + 10);
+      ctx.setLineDash([]);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#000';
+      ctx.fillStyle = '#fff';
+      if (tile.loss) { ctx.strokeText(LOSS_MARK, x + 12, y + 12); ctx.fillText(LOSS_MARK, x + 12, y + 12); }
+      if (tile.burn) ctx.fillText(BURN_MARK, x + TILE_PX - 38, y + 12);
     }
     ctx.strokeStyle = 'rgba(255,255,255,0.6)';
     ctx.lineWidth = 1;

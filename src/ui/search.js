@@ -54,15 +54,15 @@ export function createSearch(container, { onChoose = () => {}, fetchImpl = (...a
   }
 
   function resultItem(p) {
-    const lon = Number(p.lon), lat = Number(p.lat);
+    const lon = Number(p.lon), lat = Number(p.lat), name = String(p.display_name ?? 'Unnamed place');
     const inside = pointInAmazon(lon, lat);
     const btn = h('button', {
       type: 'button',
       class: inside ? 'result' : 'result result-outside',
       disabled: !inside,
       'aria-disabled': String(!inside),
-      onclick: () => onChoose({ lon, lat, name: p.display_name.split(',')[0] }),
-    }, p.display_name, inside ? null : h('span', { class: 'outside-tag' }, ' — outside the Amazon'));
+      onclick: () => onChoose({ lon, lat, name: name.split(',')[0] }),
+    }, name, inside ? null : h('span', { class: 'outside-tag' }, ' — outside the Amazon'));
     return h('li', {}, btn);
   }
 

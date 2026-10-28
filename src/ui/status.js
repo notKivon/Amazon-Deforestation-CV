@@ -21,7 +21,7 @@ export function errorMessage(err) {
   if (err?.code && ERROR_TEXT[err.code]) return ERROR_TEXT[err.code];
   if (err?.code?.startsWith?.('http_')) return `The server returned an error (${err.code.slice(5)}). Please try again.`;
   if (err?.code?.startsWith?.('invalid_')) return 'The request was not accepted. Please reselect the area and try again.';
-  return err?.message || 'Something went wrong. Please try again.';
+  return 'Something went wrong. Please try again.'; // details go to the console
 }
 
 export function createStatus(container) {

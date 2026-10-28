@@ -8,7 +8,7 @@ const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numer
 export function legend() {
   return h('ul', { class: 'legend' },
     h('li', {}, h('span', { class: 'swatch', style: { borderColor: TILE_COLOURS.forest } }), 'Forest'),
-    h('li', {}, h('span', { class: 'swatch', style: { borderColor: TILE_COLOURS.not_forest } }), 'Not Forest'),
+    h('li', {}, h('span', { class: 'swatch swatch-dashed', style: { borderColor: TILE_COLOURS.not_forest } }), 'Not Forest (dashed)'),
     h('li', {}, h('span', { class: 'swatch swatch-hatch' }), 'No data (cloud, shadow) — not counted'),
     h('li', {}, h('span', { class: 'mark' }, LOSS_MARK), 'Forest loss since the previous clear year'),
     h('li', {}, h('span', { class: 'mark' }, BURN_MARK), 'Burn detected (dNBR > 0.27)'),
@@ -65,8 +65,14 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
   );
   section.hidden = false;
   // createChart may return the chart or a promise of it (lazy-loaded Chart.js).
-  let chart = null;
-  Promise.resolve(createChart?.(chartCanvas, report)).then((c) => { chart = c ?? null; }).catch(() => {});
+  let chart = null, destroyed = false;
+  Promise.resolve(createChart?.(chartCanvas, report)).then((c) => {
+    if (destroyed) c?.destroy?.();
+    else chart = c ?? null;
+  }).catch((err) => {
+    console.error(err);
+    chartCanvas.replaceWith(h('p', { class: 'note' }, 'The chart could not be loaded; the table below has the same numbers.'));
+  });
 
   function show(i) {
     const r = report[i], s = scenes[i];
@@ -83,5 +89,5 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
   gridToggle.addEventListener('change', () => show(Number(slider.value)));
   show(report.length - 1);
 
-  return { show, slider, chart, destroy: () => chart?.destroy() };
+  return { show, slider, get chart() { return chart; }, destroy: () => { destroyed = true; chart?.destroy(); } };
 }

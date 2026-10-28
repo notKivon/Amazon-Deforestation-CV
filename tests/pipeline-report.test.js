@@ -84,6 +84,32 @@ describe('renderReport', () => {
   });
 });
 
+describe('renderReport chart lifecycle', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<section id="report" hidden></section>';
+    HTMLCanvasElement.prototype.getContext = () => null;
+  });
+  const data = () => ({ report, scenes: report.map(() => ({ truecolor: blank })), grid, zone: 'south' });
+
+  it('destroys a lazily loaded chart that arrives after destroy()', async () => {
+    const chart = { destroy: vi.fn() };
+    let resolve;
+    const v = renderReport(document.getElementById('report'), data(), { createChart: () => new Promise((r) => { resolve = r; }) });
+    v.destroy();
+    resolve(chart);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(chart.destroy).toHaveBeenCalledOnce();
+  });
+
+  it('shows a note if the chart cannot load', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    renderReport(document.getElementById('report'), data(), { createChart: () => Promise.reject(new Error('chunk failed')) });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(document.querySelector('.chart-box').textContent).toMatch(/chart could not be loaded/);
+    err.mockRestore();
+  });
+});
+
 describe('chartConfig', () => {
   it('leaves gaps for too-cloudy years and draws extended years hollow', () => {
     const ds = chartConfig(report).data.datasets[0];
