@@ -6,6 +6,8 @@
   "main": "worker/index.js",
   // Latest date supported by the pinned wrangler 4.86.0 (last release that runs on Node 20).
   "compatibility_date": "2026-04-26",
+  // The Amazon outline is imported as text and parsed (same as the Vite plugin).
+  "rules": [{ "type": "Text", "globs": ["**/*.geojson"], "fallthrough": true }],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

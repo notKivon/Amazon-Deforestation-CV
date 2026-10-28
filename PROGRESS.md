@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 3 — Geometry, seasons/years and Amazon outline
-**Next step:** M1 review
-**Last verified healthy:** 2026-10-28 after step 2 — `npm test` 5/5, `npm run build` OK, `wrangler deploy --dry-run` OK, secret grep clean
+**Current step:** M1 review
+**Next step:** 4 — Evalscripts + proxy
+**Last verified healthy:** 2026-10-28 after step 3 — `npm test` 40/40, `npm run build` OK
 
 ## Checklist
 
@@ -11,7 +11,7 @@
 
 ### M1 — Foundation (cloud)
 - [x] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
-- [ ] 3. Geometry, seasons/years and Amazon outline: `grid.js`, `season.js`, `years.js`, `region.js`, `scripts/build-outline.mjs` → commit generated `public/data/amazon-biome.geojson`; unit tests (SPEC.md → Geometry, Seasons and years, Amazon outline). Blocker if `reference/amazon-limit/` is missing.
+- [x] 3. Geometry, seasons/years and Amazon outline: `grid.js`, `season.js`, `years.js`, `region.js`, `scripts/build-outline.mjs` → commit generated `public/data/amazon-biome.geojson`; unit tests (SPEC.md → Geometry, Seasons and years, Amazon outline). Blocker if `reference/amazon-limit/` is missing.
 - [ ] M1 review: fresh review subagent; summary here.
 
 ### M2 — Data pipeline (cloud)
@@ -61,3 +61,6 @@
 - 2026-10-28: jsdom pinned to ^26.1.0 (jsdom 27+ need Node ≥ 20.19 / 22.12, and 30 needs Node 22.22). Vitest 3.2 runs with Vite 5.
 - 2026-10-28: `npm audit` reports advisories only in dev tooling (esbuild dev server, vitest/tinypool, sharp via miniflare). None of it ships in `dist/` or the Worker bundle; left as is.
 - 2026-10-28: Tests live in `tests/*.test.js`; Node environment by default, DOM tests opt in with `// @vitest-environment jsdom`. `.dev.vars.example` (names only, no values) documents the local file.
+- 2026-10-28: Outline: RAISG Amazonía dissolves to a single polygon (the source's one zero-area hole is removed by `-clean`); simplified to 1,999 vertices, bbox −79.469, −18.157, −43.618, 10.019. The build script's bbox check allows 0.5° of tolerance because the true outline reaches 10.02°N (the spec says "roughly").
+- 2026-10-28: The outline is imported as raw text everywhere (wrangler `Text` rule for `*.geojson`, matching Vite plugin in `vite.config.js`), so browser, Worker, and tests share one file at the spec path. Pure ray casting lives in `src/geo/polygon.js` so the Node build script can use it without the bundler.
+- 2026-10-28: `areaInsideAmazon` checks the snapped box centre (within 5 m of the clicked point) plus the four box corners. Tile and box corners are `[lat, lon]` in NW, NE, SE, SW order.
