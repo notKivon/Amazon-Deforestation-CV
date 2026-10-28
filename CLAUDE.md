@@ -71,7 +71,7 @@ This file loads every session. Implementation detail is in **SPEC.md**; live bui
 - Before any deploy step: `npm run build` then `grep -rE "sh-[0-9a-f]{8}|CDSE_CLIENT" dist/` must return nothing.
 
 ## Project values
-- GitHub repo: `<fill in: owner/repo>`; build branch `build`; Cloudflare Pages production deploys from `main`.
+- GitHub repo: `notKivon/Amazon-Deforestation-CV`; build branch `build`; Cloudflare Pages production deploys from `main`.
 - Cloudflare Pages project name: `<fill in>`.
 - Non-secret endpoints: token `https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token`, process `https://sh.dataspace.copernicus.eu/api/v1/process`.
 

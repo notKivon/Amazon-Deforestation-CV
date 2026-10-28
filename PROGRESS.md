@@ -4,7 +4,7 @@
 **Next step:** 2 — Scaffold
 **Last verified healthy:** — (no code yet; no package.json, so `npm test` / `npm run build` not applicable)
 
-**Waiting on (step 1, user):** remote repo had no commits and no branches before the planning files were pushed. Still missing from the repo: `public/model/` (v2 export), `reference/build_dataset.py`, `fixtures/test_tiles/` (+ `manifest.json`, optional eval.js CSV), `reference/amazon-limit/`; `main` and `build` branches; Cloudflare Pages project name; confirmation the CDSE secret was rotated.
+**Waiting on (step 1, user):** `reference/amazon-limit/` (Amazon boundary file); Cloudflare Pages project + `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` secrets and its project name; confirmation the CDSE secret was rotated; Claude Code cloud environment pointed at `build`. Done 2026-10-28: `public/model/`, `reference/build_dataset.py` (+ `build_dataset_128.py`, dataset README), `fixtures/test_tiles/` (143 tiles, manifest, v2 + v1 prediction CSVs), `main` and `build` branches.
 
 ## Checklist
 
@@ -42,6 +42,8 @@
 <!-- one short paragraph per milestone, written by the run -->
 
 ## Decisions & gotchas
+- 2026-10-28: `reference/build_dataset.py` fetches raw UINT16 bands (DN × 10000) and converts to 8-bit in Python (`to_rgb`: clip(GAIN × refl / 10000 × 255)). The falsecolor evalscript must reproduce that whole chain, including GAIN, not just the band order.
+- 2026-10-28: v2 `metadata.json`: labels ["Forest", "Not Forest"], imageSize 224. Test-tile expected predictions are in `fixtures/test_tiles/model_v2_predictions.csv` (eval.js output).
 - 2026-10-28: Hosting = Cloudflare Pages + Pages Functions (one project) rather than Vercel; keeps the site and the secret-holding proxy together.
 - 2026-10-28: Model input is the v2 SWIR false-colour composite (B11/B8A/B04) at 128 px; labels read from metadata.json by name.
 - 2026-10-28: Area capped at 8 × 8 tiles (10.24 km side, 64 tiles).
