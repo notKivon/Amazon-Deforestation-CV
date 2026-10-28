@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "dev:full": "npm run build && wrangler dev",
     "test": "vitest run",
-    "outline": "node scripts/build-outline.mjs"
+    "outline": "node scripts/build-outline.mjs",
+    "mock": "node scripts/build-mock.mjs"
   },
   "devDependencies": {
     "fflate": "^0.8.3",

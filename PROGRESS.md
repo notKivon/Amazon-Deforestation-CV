@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 4 — Evalscripts + proxy
-**Next step:** 5 — Client fetch + fallback
-**Last verified healthy:** 2026-10-28 after M1 review — `npm test` 42/42, `npm run build` OK
+**Current step:** 5 — Client fetch + fallback
+**Next step:** M2 review
+**Last verified healthy:** 2026-10-28 after step 4 — `npm test` 80/80, `npm run build` OK, `wrangler dev` MOCK smoke test OK, secret grep clean
 
 ## Checklist
 
@@ -15,7 +15,7 @@
 - [x] M1 review: fresh review subagent; summary here.
 
 ### M2 — Data pipeline (cloud)
-- [ ] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
+- [x] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
 - [ ] 5. Client fetch + PNG decode with base → extended fallback, concurrency limit and progress callback; tests for the three fallback cases against MOCK responses.
 - [ ] M2 review.
 
@@ -65,3 +65,9 @@
 - 2026-10-28: Outline: RAISG Amazonía dissolves to a single polygon (the source's one zero-area hole is removed by `-clean`); simplified to 1,999 vertices, bbox −79.469, −18.157, −43.618, 10.019. The build script's bbox check allows 0.5° of tolerance because the true outline reaches 10.02°N (the spec says "roughly").
 - 2026-10-28: The outline is imported as raw text everywhere (wrangler `Text` rule for `*.geojson`, matching Vite plugin in `vite.config.js`), so browser, Worker, and tests share one file at the spec path. Pure ray casting lives in `src/geo/polygon.js` so the Node build script can use it without the bundler.
 - 2026-10-28: `areaInsideAmazon` checks the snapped box centre (within 5 m of the clicked point) plus the four box corners. Tile and box corners are `[lat, lon]` in NW, NE, SE, SW order.
+- 2026-10-28: Units: all evalscripts use the default reflectance units, like `reference/build_dataset.py`. Falsecolor recovers the training DN as `round(v × 10000)`, then repeats `to_rgb` in float32 with `Math.fround` and truncates with `Math.floor` (numpy `.astype(uint8)` truncates). It returns exact integers so UINT8 output conversion can't change them. A test checks every DN 0–20000 against a Float32Array emulation of the Python chain. Assumes Sentinel Hub rounds float → UINT16 (B × 10000 is an integer ± float noise, so this only matters at noise level); check in step 12 by comparing a live falsecolor tile with a training tile.
+- 2026-10-28: Resampling left at the Sentinel Hub default (nearest), as in training; `harmonizeValues` left at its default, as in training.
+- 2026-10-28: Proxy rounds lon/lat to 5 dp (~1 m) before computing the box, so the cache key and the request always agree. Unknown body fields → 400 `unexpected_field`; bodies over 1 KB → 400. Missing secrets (non-mock) → 500 `not_configured`. Token-endpoint errors → 502 `auth_failed`; network errors → 502 `*_unreachable` with `upstreamStatus: 0`. A 401 from the Process API clears the token cache.
+- 2026-10-28: MOCK mode generates synthetic scenes procedurally at the exact requested size (`worker/mock.js` + a tiny PNG encoder over `CompressionStream`), instead of resizing stored PNGs. `npm run mock` writes sample images from the same generator to `fixtures/mock/` for viewing. Mock clearings grow 3 points a year; new clearings in even years get burn scars; nbr base is ~70% masked in odd years (fallback path), extended always clear. Mock responses are `no-store`.
+- 2026-10-28: Pre-deploy grep of `.wrangler-dry/` matches only the binding names `env.CDSE_CLIENT_ID` / `env.CDSE_CLIENT_SECRET` in the Worker code (expected; no values). `dist/` is clean.
+- 2026-10-28: `wrangler dev` in this sandbox serves fine but can't reach workers.cloudflare.com (blocked by egress); harmless.
