@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 7 — Analysis
-**Next step:** M3 review
-**Last verified healthy:** 2026-10-28 after step 6 — `npm test` 99/99 (parity ≈ 75 s), `npm run build` OK
+**Current step:** M3 review
+**Next step:** 8 — Map, search, status
+**Last verified healthy:** 2026-10-28 after step 7 — `npm test` 107/107, `npm run build` OK
 
 ## Checklist
 
@@ -21,7 +21,7 @@
 
 ### M3 — Model and analysis (cloud)  ∥B
 - [x] 6. ∥B (files: `src/model/*`, model tests) Model load, preprocessing, tile slicing, batch classify; parity test on `fixtures/test_tiles/` (≥ 140/143).
-- [ ] 7. ∥B (files: `src/analysis/*`, analysis tests) Validity, NBR/dNBR, cover %, loss, burn flags; synthetic tests incl. 0.27 / 0.28 threshold.
+- [x] 7. ∥B (files: `src/analysis/*`, analysis tests) Validity, NBR/dNBR, cover %, loss, burn flags; synthetic tests incl. 0.27 / 0.28 threshold.
 - [ ] M3 review.
 
 ### M4 — Interface (cloud)
@@ -79,3 +79,5 @@
 - 2026-10-28: Only valid tiles are classified (`classifyScene(..., include)`); skipped tiles return null. Batch of 16. WebGL first, CPU fallback.
 - 2026-10-28: Parity test runs on the pure-JS CPU backend (~75 s); default Vitest timeout raised to 20 s, parity setup 600 s. No tfjs-node (native binary download).
 - 2026-10-28: A stop-hook forced a mid-step save; it went to `wip/step-6` per CLAUDE.md, then was squashed onto `build` as one step commit. `wip/step-6` is left on origin (deleting it is the user's call).
+- 2026-10-28: "Previous valid year" for loss and dNBR = the tile's most recent earlier *reported* year in which it was valid. Too-cloudy (unreported) years carry no cover, tile classes, or flags, and are skipped when looking back, so a too-cloudy year never shows a loss. The first reported year has no loss or burn flags (nothing to compare).
+- 2026-10-28: Cover % and confidence use `Math.round(x × 10) / 10`. A tile's NBR is null if it has no valid pixels; then dNBR (and burn) is null/false.
