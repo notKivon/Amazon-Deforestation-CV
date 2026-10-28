@@ -12,7 +12,7 @@ import { TILE_COLOURS, describeTile } from './ui/tiles.js';
 import { createMap } from './ui/map.js';
 import { createSearch } from './ui/search.js';
 import { createControls } from './ui/controls.js';
-import { createStatus } from './ui/status.js';
+import { createStatus, errorMessage } from './ui/status.js';
 
 const state = { centre: null, box: null, inside: false, busy: false, result: null, view: null };
 const client = createClient();
@@ -23,6 +23,9 @@ function loadModelDeps() {
   modelDeps ??= Promise.all([import('./model/load.js'), import('./model/classify.js')]).then(async ([load, cls]) => {
     await load.initBackend();
     return { loaded: await load.loadModel(), classifyScene: cls.classifyScene };
+  }).catch((err) => {
+    console.error(err);
+    throw Object.assign(new Error('model_load'), { code: 'model_load' });
   });
   modelDeps.catch(() => { modelDeps = null; });
   return modelDeps;
@@ -30,7 +33,15 @@ function loadModelDeps() {
 
 const panel = document.getElementById('panel');
 const search = createSearch(panel, { onChoose: (place) => select(place, true) });
-const controls = createControls(panel, { onSizeChange: () => refresh(), onRun: () => run() });
+const controls = createControls(panel, {
+  onSizeChange: () => refresh(),
+  onRun: () => run(),
+  onCancel: () => state.abort?.abort(),
+  onUseMapCentre: () => {
+    const c = mapView.map.getCenter();
+    select({ lon: c.lng, lat: c.lat }, false);
+  },
+});
 const status = createStatus(panel);
 const mapView = createMap(document.getElementById('map'), { onSelect: (p) => select(p, false) });
 
@@ -68,20 +79,23 @@ async function run() {
   const grid = tileGrid(state.box);
   const years = availableYears(zone, new Date());
   state.busy = true;
+  state.abort = new AbortController();
   controls.setBusy(true);
   status.show('loading', `Fetching ${years.length} years of images…`, { done: 0, total: years.length * 3 });
   try {
     let model = null;
     const { report, scenes } = await runPipeline({
-      area, grid, years,
+      area, grid, years, signal: state.abort.signal,
       deps: {
         client,
         loadModel: async () => (model = await loadModelDeps()).loaded,
         classifyScene: (...a) => model.classifyScene(...a),
       },
-      onProgress: (p) => status.show('loading',
-        p.phase === 'fetch' ? `Fetching images… (${p.done} of ${p.total})` : `Classifying tiles… (year ${p.done} of ${p.total})`,
-        p),
+      onProgress: (p) => {
+        if (p.phase === 'model') status.show('loading', 'Loading the forest model…');
+        else if (p.phase === 'fetch') status.show('loading', `Fetching images… (${p.done} of ${p.total})`, p);
+        else status.show('loading', `Classifying tiles… (year ${p.done} of ${p.total})`, p);
+      },
     });
     state.result = { report, scenes, grid, zone, area };
     state.view?.destroy();
@@ -94,12 +108,14 @@ async function run() {
     if (!reportedYears) status.show('warning', 'Every year was too cloudy for this area. Try a nearby spot.');
     else if (reportedYears < report.length) status.show('info', `Done. ${report.length - reportedYears} year(s) were too cloudy to report.`);
     else status.show('info', 'Done.');
-    document.getElementById('report').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('report').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   } catch (err) {
-    console.error(err);
-    status.error(err);
+    if (err?.name !== 'AbortError') console.error(err);
+    status.show(err?.name === 'AbortError' ? 'info' : 'error', errorMessage(err));
   } finally {
     state.busy = false;
+    state.abort = null;
     controls.setBusy(false);
     controls.setSelection(state.centre, state.inside, false);
   }

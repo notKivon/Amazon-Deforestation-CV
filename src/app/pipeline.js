@@ -14,6 +14,7 @@ export async function runPipeline({ area, grid, years, deps, onProgress = () => 
     area, grid, years, signal,
     onProgress: (p) => onProgress({ phase: 'fetch', ...p }),
   });
+  onProgress({ phase: 'model' });
   const loaded = await modelPromise;
 
   const perYear = [];

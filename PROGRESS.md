@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 11 — Polish
-**Next step:** M4 review
-**Last verified healthy:** 2026-10-28 after step 10 — `npm test` 128/128, `npm run build` OK
+**Current step:** M4 review
+**Next step:** 12 — `[local]` live verification
+**Last verified healthy:** 2026-10-28 after step 11 — `npm test` 129/129, `npm run build` OK; Chromium MOCK runs via `wrangler dev` at 1280 and 375 px (no console errors, no horizontal scroll), cancel + rerun OK
 
 ## Checklist
 
@@ -28,7 +28,7 @@
 - [x] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
 - [x] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
 - [x] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
-- [ ] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
+- [x] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
 - [ ] M4 review.
 
 ### M5 — Live verification and launch (local)
@@ -93,3 +93,6 @@
 - 2026-10-28: Image date range shown under the slider is the window used (base or extended), from `windowFor`, formatted in UTC.
 - 2026-10-28: Known limitations are rendered as a list from `src/ui/model-info.js`, word for word from CLAUDE.md. Only the first letter is capitalised and a full stop added; the quoted "extended window" stays lowercase. A test parses the CLAUDE.md line and fails on any drift.
 - 2026-10-28: Tile inspector is keyboard-reachable through a "Tile" select (row/column + verdict) as well as canvas clicks. Crops are shown at 4× (512 px CSS max, shrinking on narrow screens) with `image-rendering: pixelated`. `cropTile` moved to `src/model/crop.js` so the UI doesn't import TensorFlow.
+- 2026-10-28: Browser-path parity: in headless Chromium, `decode.js` (createImageBitmap) + `classifyScene` on 21 of the held-out tiles matched eval.js on 21/21 classes, max probability error 0.000004 (CPU backend; headless SwiftShader has no float32 WebGL, so `initBackend` fell back as designed). WebGL on a real GPU is checked in step 12.
+- 2026-10-28: Polish: Cancel button aborts a run (status "Cancelled.", and the next run works); "Choose the map centre" button gives keyboard users a way to select (Leaflet arrow-key panning + button); "Loading the forest model…" phase; model load failure → readable `model_load` message; year slider `aria-valuetext`; smooth scroll respects reduced motion.
+- 2026-10-28: Mock scenes are flat synthetic colours, far outside the training data, so the model's verdicts on them mean nothing (it calls some mostly-pink mock tiles Forest). Model correctness is covered by the two parity checks, and real imagery by step 12.

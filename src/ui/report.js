@@ -72,6 +72,7 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
     const r = report[i], s = scenes[i];
     const w = windowFor(zone, r.year, r.window);
     yearLabel.textContent = `${r.year}${r.extended ? ' (extended window)' : ''}`;
+    slider.setAttribute('aria-valuetext', `${r.year}${r.reported ? `, ${r.coverPct.toFixed(1)}% forest` : ', too cloudy'}`);
     dates.textContent = `Images from ${fmtDate(w.from)} to ${fmtDate(w.to)} (least-cloudy pixels in that window).${r.reported ? '' : ' Too cloudy to report this year.'}`;
     view.setAttribute('aria-label', `True-colour image for ${r.year}: ${r.reported ? `${r.coverPct.toFixed(1)}% forest` : 'too cloudy'}.`);
     drawScene(view, s.truecolor, grid, r.reported ? r : null, { grid: gridToggle.checked });

@@ -15,7 +15,7 @@ export function sizeLabel(n) {
   return `${n} × ${n} tiles (${km.toFixed(2)} km)`;
 }
 
-export function createControls(container, { onSizeChange = () => {}, onRun = () => {} } = {}) {
+export function createControls(container, { onSizeChange = () => {}, onRun = () => {}, onCancel = () => {}, onUseMapCentre = null } = {}) {
   const select = h('select', { id: 'tiles-per-side', onchange: () => onSizeChange(Number(select.value)) });
   for (let n = MIN_TILES_PER_SIDE; n <= MAX_TILES_PER_SIDE; n++) {
     select.append(h('option', { value: n, selected: n === DEFAULT_TILES }, sizeLabel(n)));
@@ -24,10 +24,15 @@ export function createControls(container, { onSizeChange = () => {}, onRun = () 
   const zone = h('p', { class: 'zone', hidden: true });
   const outside = h('p', { class: 'outside-msg', role: 'alert', hidden: true }, OUTSIDE_AMAZON);
   const run = h('button', { type: 'button', class: 'run', disabled: true, onclick: () => onRun() }, 'Run analysis');
+  const cancel = h('button', { type: 'button', class: 'cancel', hidden: true, onclick: () => onCancel() }, 'Cancel');
+  // Keyboard alternative to clicking the map: pan with the arrow keys, then use the centre.
+  const centreBtn = onUseMapCentre
+    ? h('button', { type: 'button', class: 'secondary', onclick: () => onUseMapCentre() }, 'Choose the map centre')
+    : null;
 
   container.append(
     h('label', { for: 'tiles-per-side' }, 'Area size'),
-    select, where, zone, outside, run,
+    select, centreBtn, where, zone, outside, run, cancel,
   );
 
   return {
@@ -50,6 +55,8 @@ export function createControls(container, { onSizeChange = () => {}, onRun = () 
     },
     setBusy(busy) {
       select.disabled = busy;
+      cancel.hidden = !busy;
+      if (centreBtn) centreBtn.disabled = busy;
       run.textContent = busy ? 'Running…' : 'Run analysis';
       if (busy) run.disabled = true;
     },

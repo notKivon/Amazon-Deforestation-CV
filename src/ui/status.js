@@ -12,10 +12,12 @@ const ERROR_TEXT = {
   auth_unreachable: 'The Copernicus login service could not be reached. Please try again later.',
   not_configured: 'The imagery service is not configured on this server.',
   invalid_year: 'That year is not available for this location.',
+  model_load: 'The forest model could not be loaded. Reload the page and try again.',
 };
 
 /** Readable text for an error code from the client (ImageryError.code) or any Error. */
 export function errorMessage(err) {
+  if (err?.name === 'AbortError') return 'Cancelled.';
   if (err?.code && ERROR_TEXT[err.code]) return ERROR_TEXT[err.code];
   if (err?.code?.startsWith?.('http_')) return `The server returned an error (${err.code.slice(5)}). Please try again.`;
   if (err?.code?.startsWith?.('invalid_')) return 'The request was not accepted. Please reselect the area and try again.';

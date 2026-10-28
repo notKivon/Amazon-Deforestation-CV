@@ -29,6 +29,23 @@ describe('controls', () => {
     expect(onRun).toHaveBeenCalledOnce();
   });
 
+  it('busy state shows Cancel and offers a keyboard way to choose the map centre', () => {
+    const onCancel = vi.fn(), onUseMapCentre = vi.fn();
+    const c = createControls(document.body, { onCancel, onUseMapCentre });
+    const cancel = document.querySelector('button.cancel');
+    expect(cancel.hidden).toBe(true);
+    c.setBusy(true);
+    expect(cancel.hidden).toBe(false);
+    expect(document.querySelector('button.run').disabled).toBe(true);
+    cancel.click();
+    expect(onCancel).toHaveBeenCalledOnce();
+    c.setBusy(false);
+    expect(cancel.hidden).toBe(true);
+    const centre = [...document.querySelectorAll('button')].find((b) => b.textContent === 'Choose the map centre');
+    centre.click();
+    expect(onUseMapCentre).toHaveBeenCalledOnce();
+  });
+
   it('shows the zone and its window', () => {
     const c = createControls(document.body);
     c.setSelection({ lon: -58.8, lat: 4.5 }, true);
@@ -109,6 +126,8 @@ describe('status', () => {
     expect(errorMessage({ code: 'network' })).toMatch(/connection/);
     expect(errorMessage({ code: 'http_503' })).toMatch(/503/);
     expect(errorMessage(new Error('boom'))).toBe('boom');
+    expect(errorMessage(new DOMException('Aborted', 'AbortError'))).toBe('Cancelled.');
+    expect(errorMessage({ code: 'model_load' })).toMatch(/model could not be loaded/);
   });
 });
 

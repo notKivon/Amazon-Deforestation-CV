@@ -103,3 +103,6 @@ button.run { background: var(--accent); color: var(--accent-ink); font-weight: 6
 .colour-key li { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
 .key-swatch { width: 18px; height: 18px; border-radius: 3px; border: 1px solid #0003; }
 .limitations ul { padding-left: 1.2em; }
+button.secondary { font-size: 0.88rem; padding: 6px 10px; }
+button.cancel { border-color: var(--error); color: var(--error); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
