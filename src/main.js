@@ -7,6 +7,7 @@ import { availableYears } from './geo/years.js';
 import { createClient } from './api/client.js';
 import { runPipeline } from './app/pipeline.js';
 import { renderReport } from './ui/report.js';
+import { renderModelView } from './ui/model-view.js';
 import { TILE_COLOURS, describeTile } from './ui/tiles.js';
 import { createMap } from './ui/map.js';
 import { createSearch } from './ui/search.js';
@@ -84,9 +85,10 @@ async function run() {
     });
     state.result = { report, scenes, grid, zone, area };
     state.view?.destroy();
+    const modelView = renderModelView(document.getElementById('model-view'), state.result);
     state.view = renderReport(document.getElementById('report'), state.result, {
       createChart: (canvas, r) => import('./ui/chart.js').then((m) => m.createChart(canvas, r)),
-      onYearChange: (i) => showOnMap(grid, report[i]),
+      onYearChange: (i) => { showOnMap(grid, report[i]); modelView.setYear(i); },
     });
     const reportedYears = report.filter((r) => r.reported).length;
     if (!reportedYears) status.show('warning', 'Every year was too cloudy for this area. Try a nearby spot.');

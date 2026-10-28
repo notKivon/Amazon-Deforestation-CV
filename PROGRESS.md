@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 10 — What the model sees
-**Next step:** 11 — Polish
-**Last verified healthy:** 2026-10-28 after step 9 — `npm test` 123/123, `npm run build` OK, end-to-end MOCK run in headless Chromium via `wrangler dev` (2×2 tiles, 10 years, 25 s, no console errors)
+**Current step:** 11 — Polish
+**Next step:** M4 review
+**Last verified healthy:** 2026-10-28 after step 10 — `npm test` 128/128, `npm run build` OK
 
 ## Checklist
 
@@ -27,7 +27,7 @@
 ### M4 — Interface (cloud)
 - [x] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
 - [x] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
-- [ ] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
+- [x] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
 - [ ] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
 - [ ] M4 review.
 
@@ -91,3 +91,5 @@
 - 2026-10-28: Only reported years are classified (too-cloudy years are skipped entirely), which saves model time.
 - 2026-10-28: Report view draws the scene into a canvas at native resolution, scaled by CSS (smooth, not pixelated). Valid tiles get a coloured border (green Forest, crimson Not Forest), invalid tiles a dark hatch, loss ▼ and burn 🔥 markers; a legend explains each. The map shows the same grid for the slider's year (filled; invalid tiles dashed grey; tooltips describe each tile).
 - 2026-10-28: Image date range shown under the slider is the window used (base or extended), from `windowFor`, formatted in UTC.
+- 2026-10-28: Known limitations are rendered as a list from `src/ui/model-info.js`, word for word from CLAUDE.md. Only the first letter is capitalised and a full stop added; the quoted "extended window" stays lowercase. A test parses the CLAUDE.md line and fails on any drift.
+- 2026-10-28: Tile inspector is keyboard-reachable through a "Tile" select (row/column + verdict) as well as canvas clicks. Crops are shown at 4× (512 px CSS max, shrinking on narrow screens) with `image-rendering: pixelated`. `cropTile` moved to `src/model/crop.js` so the UI doesn't import TensorFlow.
