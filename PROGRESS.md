@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 5 — Client fetch + fallback
-**Next step:** M2 review
-**Last verified healthy:** 2026-10-28 after step 4 — `npm test` 80/80, `npm run build` OK, `wrangler dev` MOCK smoke test OK, secret grep clean
+**Current step:** M2 review
+**Next step:** 6 — Model
+**Last verified healthy:** 2026-10-28 after step 5 — `npm test` 88/88, `npm run build` OK
 
 ## Checklist
 
@@ -16,7 +16,7 @@
 
 ### M2 — Data pipeline (cloud)
 - [x] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
-- [ ] 5. Client fetch + PNG decode with base → extended fallback, concurrency limit and progress callback; tests for the three fallback cases against MOCK responses.
+- [x] 5. Client fetch + PNG decode with base → extended fallback, concurrency limit and progress callback; tests for the three fallback cases against MOCK responses.
 - [ ] M2 review.
 
 ### M3 — Model and analysis (cloud)  ∥B
@@ -71,3 +71,5 @@
 - 2026-10-28: MOCK mode generates synthetic scenes procedurally at the exact requested size (`worker/mock.js` + a tiny PNG encoder over `CompressionStream`), instead of resizing stored PNGs. `npm run mock` writes sample images from the same generator to `fixtures/mock/` for viewing. Mock clearings grow 3 points a year; new clearings in even years get burn scars; nbr base is ~70% masked in odd years (fallback path), extended always clear. Mock responses are `no-store`.
 - 2026-10-28: Pre-deploy grep of `.wrangler-dry/` matches only the binding names `env.CDSE_CLIENT_ID` / `env.CDSE_CLIENT_SECRET` in the Worker code (expected; no values). `dist/` is clean.
 - 2026-10-28: `wrangler dev` in this sandbox serves fine but can't reach workers.cloudflare.com (blocked by egress); harmless.
+- 2026-10-28: `tileValidity` / `validTileShare` were written in step 5 (in `src/analysis/report.js`) because the client's fallback needs them; step 7 extends that module. A mask pixel counts as valid if G ≥ 128.
+- 2026-10-28: Client: the first failure (or the caller's AbortSignal) aborts every outstanding request; error codes come from the proxy's JSON `error` (`outside_amazon`, `upstream_error`, …), else `http_<status>` or `network`. Client tests drive the real Worker handler in MOCK mode. `src/api/decode.js` (createImageBitmap) is browser-only; it gets a browser check in step 9.
