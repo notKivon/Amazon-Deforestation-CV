@@ -1,0 +1,1125 @@
+{
+ "rules": {
+  "chip_px": 128,
+  "forest_max_cf": 0.3,
+  "not_forest_min_cf": 0.5,
+  "excluded_by_eye": [
+   "anapu_PA_r05c02.png",
+   "colniza_MT_r09c15.png",
+   "itaituba_PA_r00c02.png",
+   "itaituba_PA_r02c08.png",
+   "paragominas_PA_r01c00.png",
+   "paragominas_PA_r01c06.png",
+   "paragominas_PA_r02c07.png",
+   "paragominas_PA_r05c11.png",
+   "paragominas_PA_r09c14.png",
+   "paragominas_PA_r13c05.png",
+   "paragominas_PA_r14c11.png",
+   "tailandia_PA_r00c15.png",
+   "tailandia_PA_r01c06.png",
+   "tailandia_PA_r01c08.png",
+   "tailandia_PA_r09c04.png",
+   "tailandia_PA_r11c02.png",
+   "tailandia_PA_r11c09.png"
+  ]
+ },
+ "stats": {
+  "labrea_AM": {
+   "forest_pure": 116,
+   "skipped": 57,
+   "forest_edge": 61,
+   "not_forest_edge": 16,
+   "not_forest_pure": 6
+  },
+  "anapu_PA": {
+   "skipped": 236,
+   "forest_edge": 15,
+   "forest_pure": 5
+  },
+  "colniza_MT": {
+   "not_forest_edge": 115,
+   "forest_edge": 19,
+   "skipped": 38,
+   "not_forest_pure": 84
+  },
+  "paragominas_PA": {
+   "skipped": 39,
+   "forest_edge": 133,
+   "not_forest_edge": 32,
+   "forest_pure": 31,
+   "not_forest_pure": 21
+  },
+  "porto_velho_RO": {
+   "skipped": 59,
+   "not_forest_edge": 71,
+   "not_forest_pure": 52,
+   "forest_edge": 68,
+   "forest_pure": 6
+  },
+  "serra_divisor_AC": {
+   "forest_pure": 237,
+   "forest_edge": 19
+  },
+  "juruena_NP": {
+   "forest_pure": 221,
+   "forest_edge": 15,
+   "skipped": 20
+  },
+  "pico_neblina_AM": {
+   "skipped": 146,
+   "not_forest_pure": 2,
+   "forest_edge": 11,
+   "forest_pure": 96,
+   "not_forest_edge": 1
+  },
+  "terra_do_meio_PA": {
+   "forest_pure": 255,
+   "forest_edge": 1
+  },
+  "abufari_AM": {
+   "forest_pure": 230,
+   "skipped": 26
+  },
+  "humaita_AM": {
+   "not_forest_pure": 54,
+   "not_forest_edge": 17,
+   "skipped": 57,
+   "forest_edge": 64,
+   "forest_pure": 64
+  },
+  "machadinho_RO": {
+   "not_forest_pure": 59,
+   "skipped": 54,
+   "not_forest_edge": 84,
+   "forest_edge": 45,
+   "forest_pure": 14
+  },
+  "tailandia_PA": {
+   "forest_edge": 125,
+   "skipped": 72,
+   "not_forest_edge": 34,
+   "forest_pure": 13,
+   "not_forest_pure": 12
+  },
+  "itaituba_PA": {
+   "forest_edge": 120,
+   "skipped": 10,
+   "forest_pure": 123,
+   "not_forest_edge": 3
+  },
+  "humaita_south_AM": {
+   "forest_edge": 53,
+   "forest_pure": 194,
+   "skipped": 4,
+   "not_forest_edge": 5
+  },
+  "lavrado_RR": {
+   "skipped": 9,
+   "not_forest_pure": 219,
+   "not_forest_edge": 28
+  }
+ },
+ "chips": [
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "serra_divisor_AC_r13c11.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.008
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r13c10.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.021
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "serra_divisor_AC_r06c06.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.005
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r08c11.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.01
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r11c09.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.007
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r05c06.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.019
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r06c10.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.115
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r08c03.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.192
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r06c01.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.029
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r11c01.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.087
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r10c15.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.177
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r15c10.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.255
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_south_AM_r03c02.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.176
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r14c08.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.157
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r13c01.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.004
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "paragominas_PA_r04c13.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.009
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_south_AM_r14c11.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.005
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "pico_neblina_AM_r09c13.png",
+   "region": "pico_neblina_AM",
+   "cleared_fraction": 0.006
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "juruena_NP_r10c12.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.018
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "labrea_AM_r02c13.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.004
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_south_AM_r03c07.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.065
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r11c06.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.235
+  },
+  {
+   "class": "forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r09c11.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.009
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r12c14.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r00c08.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "terra_do_meio_PA_r08c15.png",
+   "region": "terra_do_meio_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "terra_do_meio_PA_r06c10.png",
+   "region": "terra_do_meio_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r01c02.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r08c10.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "terra_do_meio_PA_r09c08.png",
+   "region": "terra_do_meio_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "abufari_AM_r15c02.png",
+   "region": "abufari_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "humaita_south_AM_r08c06.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "abufari_AM_r11c15.png",
+   "region": "abufari_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r10c04.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r13c13.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "itaituba_PA_r12c07.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.002
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r15c14.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r14c05.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r14c13.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "itaituba_PA_r03c10.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "pico_neblina_AM_r12c12.png",
+   "region": "pico_neblina_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "humaita_south_AM_r06c06.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r01c05.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r05c01.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "terra_do_meio_PA_r09c00.png",
+   "region": "terra_do_meio_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r15c05.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r11c08.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r12c15.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "abufari_AM_r05c15.png",
+   "region": "abufari_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r05c12.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r12c13.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.001
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r14c10.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.001
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "serra_divisor_AC_r07c11.png",
+   "region": "serra_divisor_AC",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "itaituba_PA_r13c06.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r07c07.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "abufari_AM_r03c03.png",
+   "region": "abufari_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "pico_neblina_AM_r11c15.png",
+   "region": "pico_neblina_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "juruena_NP_r05c05.png",
+   "region": "juruena_NP",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "itaituba_PA_r13c14.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "pico_neblina_AM_r13c12.png",
+   "region": "pico_neblina_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "humaita_south_AM_r08c05.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "terra_do_meio_PA_r11c10.png",
+   "region": "terra_do_meio_PA",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r06c00.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.0
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "labrea_AM_r13c05.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.693
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r15c09.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.613
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r14c15.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.522
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r08c03.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.561
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r07c08.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.745
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r00c02.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.557
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "paragominas_PA_r12c11.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.636
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r03c13.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.694
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "lavrado_RR_r04c04.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.652
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r05c04.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.747
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r14c14.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.588
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r01c15.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.686
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r08c11.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.644
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r00c10.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.534
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "lavrado_RR_r06c07.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.693
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r00c09.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.658
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r06c07.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.506
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r10c03.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.516
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r11c06.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.673
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "labrea_AM_r11c10.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.519
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r07c04.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.64
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r12c04.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.645
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "colniza_MT_r01c10.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.602
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "paragominas_PA_r00c03.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.565
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "itaituba_PA_r12c01.png",
+   "region": "itaituba_PA",
+   "cleared_fraction": 0.607
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "humaita_AM_r14c00.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.706
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r14c09.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.619
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "humaita_south_AM_r04c03.png",
+   "region": "humaita_south_AM",
+   "cleared_fraction": 0.541
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r01c05.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.599
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "paragominas_PA_r10c12.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.633
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "lavrado_RR_r01c06.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.744
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "tailandia_PA_r13c10.png",
+   "region": "tailandia_PA",
+   "cleared_fraction": 0.592
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r11c15.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.701
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r00c14.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.509
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "lavrado_RR_r07c10.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.734
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "labrea_AM_r14c02.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.582
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r15c12.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.586
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "machadinho_RO_r04c14.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.702
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r07c09.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.625
+  },
+  {
+   "class": "not_forest",
+   "stratum": "edge",
+   "file": "porto_velho_RO_r07c06.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.513
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r13c15.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.836
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "paragominas_PA_r11c01.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.854
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r06c04.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.884
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r03c09.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.913
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r00c03.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.939
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r00c06.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.816
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r08c07.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.898
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r05c10.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.848
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r11c13.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.98
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r07c02.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.793
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r10c08.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.975
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r08c02.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.816
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r13c02.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.829
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r10c09.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.978
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r14c09.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.834
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r05c00.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.966
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r11c12.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.96
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "lavrado_RR_r03c04.png",
+   "region": "lavrado_RR",
+   "cleared_fraction": 0.842
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "labrea_AM_r08c10.png",
+   "region": "labrea_AM",
+   "cleared_fraction": 0.76
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "paragominas_PA_r06c08.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.914
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "tailandia_PA_r13c13.png",
+   "region": "tailandia_PA",
+   "cleared_fraction": 0.76
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r00c01.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.99
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r07c07.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.824
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "porto_velho_RO_r03c08.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.793
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "porto_velho_RO_r06c10.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.755
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r06c01.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.802
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r11c03.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.846
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r02c02.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.797
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r13c04.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.994
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r11c15.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.752
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "paragominas_PA_r09c12.png",
+   "region": "paragominas_PA",
+   "cleared_fraction": 0.759
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r04c14.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.788
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "colniza_MT_r01c11.png",
+   "region": "colniza_MT",
+   "cleared_fraction": 0.832
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r04c03.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.753
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r10c02.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.963
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r10c04.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.842
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "humaita_AM_r08c04.png",
+   "region": "humaita_AM",
+   "cleared_fraction": 0.86
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "machadinho_RO_r10c12.png",
+   "region": "machadinho_RO",
+   "cleared_fraction": 0.761
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "porto_velho_RO_r09c11.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.752
+  },
+  {
+   "class": "not_forest",
+   "stratum": "pure",
+   "file": "porto_velho_RO_r00c03.png",
+   "region": "porto_velho_RO",
+   "cleared_fraction": 0.862
+  }
+ ]
+}
