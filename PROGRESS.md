@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 6 — Model
-**Next step:** 7 — Analysis
-**Last verified healthy:** 2026-10-28 after M2 review — `npm test` 93/93, `npm run build` OK
+**Current step:** 7 — Analysis
+**Next step:** M3 review
+**Last verified healthy:** 2026-10-28 after step 6 — `npm test` 99/99 (parity ≈ 75 s), `npm run build` OK
 
 ## Checklist
 
@@ -20,7 +20,7 @@
 - [x] M2 review.
 
 ### M3 — Model and analysis (cloud)  ∥B
-- [ ] 6. ∥B (files: `src/model/*`, model tests) Model load, preprocessing, tile slicing, batch classify; parity test on `fixtures/test_tiles/` (≥ 140/143).
+- [x] 6. ∥B (files: `src/model/*`, model tests) Model load, preprocessing, tile slicing, batch classify; parity test on `fixtures/test_tiles/` (≥ 140/143).
 - [ ] 7. ∥B (files: `src/analysis/*`, analysis tests) Validity, NBR/dNBR, cover %, loss, burn flags; synthetic tests incl. 0.27 / 0.28 threshold.
 - [ ] M3 review.
 
@@ -75,3 +75,7 @@
 - 2026-10-28: `wrangler dev` in this sandbox serves fine but can't reach workers.cloudflare.com (blocked by egress); harmless.
 - 2026-10-28: `tileValidity` / `validTileShare` were written in step 5 (in `src/analysis/report.js`) because the client's fallback needs them; step 7 extends that module. A mask pixel counts as valid if G ≥ 128.
 - 2026-10-28: Client: the first failure (or the caller's AbortSignal) aborts every outstanding request; error codes come from the proxy's JSON `error` (`outside_amazon`, `upstream_error`, …), else `http_<status>` or `network`. Client tests drive the real Worker handler in MOCK mode. `src/api/decode.js` (createImageBitmap) is browser-only; it gets a browser check in step 9.
+- 2026-10-28: Preprocessing pinned empirically against `model_v2_predictions.csv` (eval.js itself isn't in the repo): `tf.image.resizeBilinear(…, [224, 224], alignCorners = true)` then `x / 127.5 − 1` reproduces every probability to < 0.00001 (143/143 class agreement, 141/143 correct). Default bilinear (alignCorners false) was off by up to 0.45 and flipped one tile; halfPixelCenters off by up to 0.096; ÷127 (TM library style) also worse. The parity test now also asserts probabilities within 0.001.
+- 2026-10-28: Only valid tiles are classified (`classifyScene(..., include)`); skipped tiles return null. Batch of 16. WebGL first, CPU fallback.
+- 2026-10-28: Parity test runs on the pure-JS CPU backend (~75 s); default Vitest timeout raised to 20 s, parity setup 600 s. No tfjs-node (native binary download).
+- 2026-10-28: A stop-hook forced a mid-step save; it went to `wip/step-6` per CLAUDE.md, then was squashed onto `build` as one step commit. `wip/step-6` is left on origin (deleting it is the user's call).

@@ -16,5 +16,6 @@ export default defineConfig({
     // Node by default; DOM tests opt in with `// @vitest-environment jsdom`.
     environment: 'node',
     include: ['tests/**/*.test.js'],
+    testTimeout: 20_000,
   },
 });
