@@ -6,6 +6,10 @@ describe('zoneFor', () => {
   it('1.999 → south', () => expect(zoneFor(1.999)).toBe('south'));
   it('2.0 → north', () => expect(zoneFor(2.0)).toBe('north'));
   it('−7 → south', () => expect(zoneFor(-7)).toBe('south'));
+  it('rejects non-numbers', () => {
+    expect(() => zoneFor(NaN)).toThrow(RangeError);
+    expect(() => zoneFor('2')).toThrow(RangeError);
+  });
 });
 
 describe('windowFor 2025', () => {

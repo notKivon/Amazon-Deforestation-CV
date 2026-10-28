@@ -2,6 +2,7 @@
 export const NORTH_ZONE_MIN_LAT = 2.0;
 
 export function zoneFor(lat) {
+  if (typeof lat !== 'number' || !Number.isFinite(lat)) throw new RangeError('lat must be a finite number');
   return lat >= NORTH_ZONE_MIN_LAT ? 'north' : 'south';
 }
 

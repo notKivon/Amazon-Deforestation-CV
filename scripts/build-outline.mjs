@@ -36,6 +36,12 @@ function vertexCount(geometry) {
   return geometryPolygons(geometry).flat().reduce((n, ring) => n + ring.length - 1, 0);
 }
 
+// SPEC sanity check: the filter must keep exactly one source feature (before dissolving).
+async function countAmazonFeatures(shp) {
+  const out = await mapshaper.applyCommands(`-i "${shp}" encoding=utf8 -filter "id_bioma === 1" -o out.json format=geojson`);
+  return JSON.parse(out['out.json']).features.length;
+}
+
 async function run(shp, pct) {
   const cmd =
     `-i "${shp}" encoding=utf8 -filter "id_bioma === 1" -dissolve ` +
@@ -49,6 +55,8 @@ async function run(shp, pct) {
 const dir = extract();
 try {
   const shp = join(dir, 'Biomas.shp');
+  const kept = await countAmazonFeatures(shp);
+  if (kept !== 1) fail(`expected exactly 1 feature with id_bioma = 1, got ${kept}`);
   // Binary-search the largest retained percentage that stays within the vertex budget.
   let lo = 0.001, hi = 5, best = null;
   for (let i = 0; i < 25; i++) {
@@ -58,7 +66,6 @@ try {
   }
   if (!best) fail(`could not simplify to ≤ ${MAX_VERTICES} vertices`);
 
-  if (best.features.length !== 1) fail(`expected exactly 1 feature, got ${best.features.length}`);
   const geom = best.features[0].geometry;
   const idx = indexGeometry(geom);
   const xs = idx.flatMap((p) => [p.minX, p.maxX]);

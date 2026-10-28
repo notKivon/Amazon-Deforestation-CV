@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** M1 review
-**Next step:** 4 — Evalscripts + proxy
-**Last verified healthy:** 2026-10-28 after step 3 — `npm test` 40/40, `npm run build` OK
+**Current step:** 4 — Evalscripts + proxy
+**Next step:** 5 — Client fetch + fallback
+**Last verified healthy:** 2026-10-28 after M1 review — `npm test` 42/42, `npm run build` OK
 
 ## Checklist
 
@@ -12,7 +12,7 @@
 ### M1 — Foundation (cloud)
 - [x] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
 - [x] 3. Geometry, seasons/years and Amazon outline: `grid.js`, `season.js`, `years.js`, `region.js`, `scripts/build-outline.mjs` → commit generated `public/data/amazon-biome.geojson`; unit tests (SPEC.md → Geometry, Seasons and years, Amazon outline). Blocker if `reference/amazon-limit/` is missing.
-- [ ] M1 review: fresh review subagent; summary here.
+- [x] M1 review: fresh review subagent; summary here.
 
 ### M2 — Data pipeline (cloud)
 - [ ] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
@@ -38,6 +38,7 @@
 
 ## Milestone summaries
 <!-- one short paragraph per milestone, written by the run -->
+**M1 — Foundation (2026-10-28).** Scaffolded a Worker with static assets (`wrangler.jsonc`, `worker/index.js` routing, stub proxy), Vite 5, Vitest 3 + jsdom, and the cloud setup hook. Built UTM geometry, dry-season windows, available years, and the RAISG Amazon outline (1,999 vertices) with the centre + corners hard-limit check. Review confirmed all core rules (windows, 2.0° boundary, year cutoffs, EPSG, 10 m snapping, corners) and found no bugs; fixed its hardening items (`areaBox` rejects bad sizes/coordinates, `zoneFor` rejects non-numbers, outline script now counts features before dissolving). One review finding (stale Pages wording in CLAUDE.md) was a false positive — the reviewer read a pre-edit copy. Open: the outline ships twice (static file at the spec path + inlined in JS, 42 KB); Node 20 compatibility is untested here (the sandbox has Node 22).
 
 ## Decisions & gotchas
 - 2026-10-28: Amazon outline = RAISG Biomes 2025, Amazonía feature only (excludes Cerrado and Andes), rather than the broader RAISG Limits layer. Credit RAISG in the map attribution and model info panel.

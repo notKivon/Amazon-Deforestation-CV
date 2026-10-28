@@ -20,6 +20,11 @@ describe('areaBox', () => {
     });
   }
 
+  it('rejects non-integer or out-of-range sizes and bad coordinates', () => {
+    for (const n of [1, 9, 4.5, '4', NaN]) expect(() => areaBox(-60, -3, n)).toThrow(RangeError);
+    expect(() => areaBox(NaN, -3, 4)).toThrow(RangeError);
+  });
+
   it('is centred on the point within 5 m', () => {
     const b = areaBox(-55.42, -7.05, 8);
     const [x, y] = toUtm(b.epsg, -55.42, -7.05);

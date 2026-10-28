@@ -29,7 +29,14 @@ export function toLatLon(epsg, x, y) {
   return [lat, lon];
 }
 
+export const MIN_TILES_PER_SIDE = 2;
+export const MAX_TILES_PER_SIDE = 8;
+
 export function areaBox(lon, lat, tilesPerSide) {
+  if (!Number.isInteger(tilesPerSide) || tilesPerSide < MIN_TILES_PER_SIDE || tilesPerSide > MAX_TILES_PER_SIDE) {
+    throw new RangeError(`tilesPerSide must be an integer ${MIN_TILES_PER_SIDE}–${MAX_TILES_PER_SIDE}`);
+  }
+  if (!Number.isFinite(lon) || !Number.isFinite(lat)) throw new RangeError('lon/lat must be finite numbers');
   const epsg = utmEpsg(lon, lat);
   const [x, y] = toUtm(epsg, lon, lat);
   const cx = Math.round(x / PIXEL_M) * PIXEL_M;
