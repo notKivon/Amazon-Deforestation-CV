@@ -5,13 +5,14 @@ A website for a school AI/ML project. The user picks a location in the Amazon (s
 This file loads every session. Implementation detail is in **SPEC.md**; live build status and "where to resume" is in **PROGRESS.md**. **Read all three at the start of every session.**
 
 ## Tech stack
-- Node 20, Vite 5, **plain JavaScript (ES modules), no TypeScript, no UI framework**.
-- Hosting: **Cloudflare Pages** (static site from `dist/`) + **Pages Functions** in `functions/` for the Copernicus proxy. One project, one deploy. Wrangler 3 for local dev.
+- Node 20 (set by the `.node-version` file, not by a variable), Vite 5, **plain JavaScript (ES modules), no TypeScript, no UI framework**.
+- Hosting: **Cloudflare Workers with static assets**, deployed by Workers Builds from Git. Worker name `amazon-deforestation-cv`. The Worker (`worker/`) holds the Copernicus proxy; the static site is served from `dist/` via the `ASSETS` binding. One Worker, one deploy. Use the current Wrangler major version.
+- `wrangler.jsonc` has: `name`, `main: "worker/index.js"`, a current `compatibility_date`, and `assets: { directory: "./dist", binding: "ASSETS", run_worker_first: ["/api/*"] }`. **No `vars` block, ever.**
 - Map: Leaflet 1.9.x with OpenStreetMap tiles (attribution shown). Search: OSM Nominatim.
 - Projection: proj4 2.x (UTM maths for exact 10 m pixel grids).
 - Model: `@tensorflow/tfjs` 4.x in the browser; v2 Teachable Machine export in `public/model/` (`model.json`, `weights.bin`, `metadata.json`).
 - Charts: Chart.js 4.x.
-- Tests: Vitest (+ jsdom for DOM modules). Commands: `npm test`, `npm run build`, `npm run dev` (Vite), `npm run dev:full` (wrangler pages dev, needs `.dev.vars`).
+- Tests: Vitest (+ jsdom for DOM modules). Commands: `npm test`, `npm run build`, `npm run dev` (Vite), `npm run dev:full` (= `npm run build && wrangler dev`; reads `.dev.vars`, where `MOCK=1` can go for mock runs).
 - Imagery: Copernicus Data Space Ecosystem (CDSE) Sentinel Hub Process API, collection `sentinel-2-l2a`.
 
 ## Code rules
@@ -66,13 +67,13 @@ This file loads every session. Implementation detail is in **SPEC.md**; live bui
 
 ## Secrets policy
 - **Never in repo, bundle, logs, or cloud environment variables:** the CDSE client ID and client secret.
-- They live only as Cloudflare Pages secrets `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET`, and locally in `.dev.vars` (gitignored).
+- They live only as Worker secrets `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` (dashboard → Settings → Variables and Secrets, type Secret), and locally in `.dev.vars` (gitignored). Never put them in `vars` (in `wrangler.jsonc` or the dashboard).
 - The browser never talks to CDSE. It calls `/api/imagery`, which builds the request server-side from validated inputs; clients cannot send evalscripts, bounding boxes or dates (they choose only `base` or `extended`).
-- Before any deploy step: `npm run build` then `grep -rE "sh-[0-9a-f]{8}|CDSE_CLIENT" dist/` must return nothing.
+- Before any deploy step: `npm run build`, then `npx wrangler deploy --dry-run --outdir .wrangler-dry`; `grep -rE "sh-[0-9a-f]{8}|CDSE_CLIENT" dist/` must return nothing, and the same grep over `.wrangler-dry/` must find no secret values (only the `env.CDSE_CLIENT_*` binding names the Worker reads).
 
 ## Project values
-- GitHub repo: `notKivon/Amazon-Deforestation-CV`; build branch `build`; Cloudflare Pages production deploys from `main`.
-- Cloudflare Pages project name: `<fill in>`.
+- GitHub repo: `notKivon/Amazon-Deforestation-CV`; build branch `build`; Workers Builds deploys production from `main`.
+- Worker: `amazon-deforestation-cv` (URL: `<fill in after first successful deploy>`).
 - Non-secret endpoints: token `https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token`, process `https://sh.dataspace.copernicus.eu/api/v1/process`.
 
 ## Run environment

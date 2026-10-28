@@ -21,9 +21,12 @@ src/
   ui/report.js         chart, year slider, true-colour view, counts
   ui/model-view.js     false-colour view, tile inspector, model info + limitations
   ui/status.js         loading / error / warning banners
-functions/api/imagery.js   Pages Function proxy
+worker/index.js            Worker entry: POST /api/imagery → worker/imagery.js; everything else → env.ASSETS.fetch
+worker/imagery.js          Copernicus proxy (validation, token, cache, MOCK mode)
 shared/evalscripts.js      the three evalscripts (server-only import)
-shared/geo.js              re-exports grid, season, years and region modules for the function (the function imports the outline GeoJSON at build time)
+shared/geo.js              re-exports grid, season, years and region modules for the Worker (the Worker imports the outline GeoJSON at bundle time)
+wrangler.jsonc             Worker config (name, main, compatibility_date, assets; no vars block)
+.node-version              `20` (sets the Node version for Workers Builds)
 public/model/              v2 TF.js export (user-supplied)
 public/data/amazon-biome.geojson   simplified Amazon outline (generated in step 3 from reference/amazon-limit/)
 reference/                 build_dataset.py (or its evalscript) from the training repo (user-supplied)
@@ -55,13 +58,14 @@ docs/verification.md       results of the [local] live verification
 - `region.js`: `pointInAmazon(lon, lat)` (ray casting, handles multipolygons and holes); `areaInsideAmazon(box)` → true only if centre and all four corner lat/lons are inside. Shared with the proxy via `shared/`.
 - Tests: Manaus inside, Brasília outside, an Atlantic point outside, a box straddling the edge rejected.
 
-## Proxy (`functions/api/imagery.js`)
+## Proxy (`worker/index.js` + `worker/imagery.js`)
+- `worker/index.js` routes `POST /api/imagery` to `worker/imagery.js` and sends every other request to `env.ASSETS.fetch(request)`. Other methods on `/api/imagery` → 405; other `/api/*` paths → 404 JSON.
 - `POST /api/imagery` body `{ lon, lat, tilesPerSide, year, product, window }`. Validate types and ranges (lon/lat finite, tilesPerSide integer 2–8, product ∈ truecolor|falsecolor|nbr, window ∈ base|extended, year ∈ availableYears(zoneFor(lat), now)); else 400 JSON `{ error }`. Also 400 `{ error: "outside_amazon" }` if `areaInsideAmazon(box)` is false.
 - Compute the box with the shared grid module and the dates with `windowFor(zoneFor(lat), year, window)` — the server, not the client, decides dates. Build a Process API request: `input.bounds.bbox` in UTM with `properties.crs = http://www.opengis.net/def/crs/EPSG/0/<epsg>`, `timeRange` from that window, `mosaickingOrder` / `maxCloudCoverage` per CLAUDE.md, `output.width/height` = pixels, `responses: [{ identifier: "default", format: { type: "image/png" } }]`.
 - Token: client-credentials grant to the CDSE token URL with `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET`; cache in module scope until `expires_in − 60 s`.
-- Cache: Cloudflare Cache API, key `imagery:<product>:<window>:<lon 5dp>:<lat 5dp>:<tiles>:<year>`, `Cache-Control: public, max-age=2592000`.
+- Cache: Cloudflare Cache API, key `imagery:<product>:<window>:<lon 5dp>:<lat 5dp>:<tiles>:<year>` (as a synthetic URL), `Cache-Control: public, max-age=2592000`. The Cache API is a no-op on `*.workers.dev` hostnames; keep the code (it works once a custom domain is attached) and make every cache read/write fail silently (try/catch, never blocks the response). No KV or other storage service.
 - Upstream errors → 502 JSON `{ error, upstreamStatus }`. Never log or echo credentials.
-- `MOCK=1` env: skip CDSE, return `fixtures/mock/<product>.png` resized/cropped to the requested size (or pre-generated at 512 × 512 and 1024 × 1024 and served as-is for those sizes; other sizes may use the nearest and the client crops). Mock `nbr` for `base` in odd years has ~70% of pixels masked so the fallback path is exercised; `extended` is always mostly clear.
+- `MOCK=1` (from `.dev.vars` locally or the test env; never a `vars` entry): skip CDSE, return `fixtures/mock/<product>.png` resized/cropped to the requested size (or pre-generated at 512 × 512 and 1024 × 1024 and served as-is for those sizes; other sizes may use the nearest and the client crops). Mock `nbr` for `base` in odd years has ~70% of pixels masked so the fallback path is exercised; `extended` is always mostly clear.
 
 ## Evalscripts (`shared/evalscripts.js`)
 - `truecolor`: input B02, B03, B04, SCL; output 3 bands UINT8; `[2.5 * B04, 2.5 * B03, 2.5 * B02] * 255`, clamped.
@@ -97,7 +101,7 @@ docs/verification.md       results of the [local] live verification
 ## External service setup (all ⏸️ user actions, batched in step 1)
 - **CDSE:** rotate the OAuth client secret (the old one has been pasted into chats). Keep the new ID/secret for Cloudflare and `.dev.vars` only.
 - **GitHub:** create the repo, commit the planning files to `main`, create branch `build`.
-- **Cloudflare Pages:** create project connected to the repo; production branch `main`; build command `npm run build`; output `dist`; add secrets `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node 20.
+- **Cloudflare Worker:** `amazon-deforestation-cv`, connected to the repo via Workers Builds; production branch `main`; build command `npm run build`; deploy command `npx wrangler deploy`; Secrets (Settings → Variables and Secrets, type Secret) `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node version from `.node-version` (20).
 - **Claude Code cloud environment:** point at the repo; no secret environment variables; default network (npm + GitHub).
 - **Files to add to the repo** (commit to `main` before branching): `public/model/` (v2 TF.js export), `reference/build_dataset.py`, `fixtures/test_tiles/` (v2 `Images_128/test/` contents + `manifest.json`, and the eval.js predictions CSV if available), and `reference/amazon-limit/` containing one Amazon biome boundary file covering all nine countries (e.g. the biogeographic Amazon limit published by RAISG, as a shapefile .zip or GeoJSON). The cloud sandbox can't download it, so it must be in the repo.
 
@@ -117,4 +121,4 @@ docs/verification.md       results of the [local] live verification
   - North zone: Iwokrama Forest, Guyana (centre 4.50, −58.80), 8 tiles per side → requests use the Dec–Mar window; record how many years were reported, how many needed the extended window, and the cover range.
   - Outside: Brasília (−15.79, −47.88) → Run disabled in the UI and a direct POST to `/api/imagery` returns 400 `outside_amazon`.
   - Fallback: record at least one real year where the extended window was used, with its valid-tile % before and after.
-  - First full 8 × 8 run completes within 90 s; repeat run (cached) within 10 s.
+  - First full 8 × 8 run completes within 90 s. Repeat run (cached): best effort; only measured on a custom domain (the Cache API does nothing on `*.workers.dev`).

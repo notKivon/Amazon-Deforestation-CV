@@ -4,20 +4,20 @@
 **Next step:** 2 — Scaffold
 **Last verified healthy:** — (no code yet; no package.json, so `npm test` / `npm run build` not applicable)
 
-**Waiting on (step 1, user):** Cloudflare Pages project + `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` secrets and its project name; confirmation the CDSE secret was rotated; Claude Code cloud environment pointed at `build`. Done 2026-10-28: `public/model/`, `reference/build_dataset.py` (+ `build_dataset_128.py`, dataset README), `fixtures/test_tiles/` (143 tiles, manifest, v2 + v1 prediction CSVs), `main` and `build` branches, `reference/amazon-limit/raisg_biomes_2025.zip` (RAISG Biomes 2025).
+**Waiting on (step 1, user):** Cloudflare Worker + `CDSE_CLIENT_ID` / `CDSE_CLIENT_SECRET` secrets and its project name; confirmation the CDSE secret was rotated; Claude Code cloud environment pointed at `build`. Done 2026-10-28: `public/model/`, `reference/build_dataset.py` (+ `build_dataset_128.py`, dataset README), `fixtures/test_tiles/` (143 tiles, manifest, v2 + v1 prediction CSVs), `main` and `build` branches, `reference/amazon-limit/raisg_biomes_2025.zip` (RAISG Biomes 2025).
 
 ## Checklist
 
 ### M0 — Setup (user)
-- [ ] 1. ⏸️ **Setup batch.** User does everything in SPEC.md → "External service setup": rotate CDSE secret; create GitHub repo + `build` branch; add `public/model/`, `reference/build_dataset.py`, `fixtures/test_tiles/`, `reference/amazon-limit/` (Amazon biome boundary file); create Cloudflare Pages project with the two secrets; create the Claude Code cloud environment. Report back: repo `owner/name`, Pages project name, and whether the eval.js predictions CSV was included. Agent then fills Project values in CLAUDE.md (planning-only commit).
+- [ ] 1. ⏸️ **Setup batch.** User does everything in SPEC.md → "External service setup": rotate CDSE secret; create GitHub repo + `build` branch; add `public/model/`, `reference/build_dataset.py`, `fixtures/test_tiles/`, `reference/amazon-limit/` (Amazon biome boundary file); create the Cloudflare Worker (Workers Builds from Git) with the two Secrets; create the Claude Code cloud environment. Report back: repo `owner/name`, Worker name, and whether the eval.js predictions CSV was included. Agent then fills Project values in CLAUDE.md (planning-only commit).
 
 ### M1 — Foundation (cloud)
-- [ ] 2. Scaffold: Vite + plain JS, `functions/`, `wrangler.toml`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
+- [ ] 2. Scaffold: Vite + plain JS, `wrangler.jsonc`, `worker/` (index.js routing `/api/imagery` + ASSETS fallthrough, stub imagery.js), `.node-version`, Vitest + jsdom, `.gitignore` (incl. `.dev.vars`, `dist/`), `scripts/setup.sh`, `.claude/settings.json` SessionStart hook, npm scripts from CLAUDE.md. Test: `npm test` (one placeholder test) + `npm run build`.
 - [ ] 3. Geometry, seasons/years and Amazon outline: `grid.js`, `season.js`, `years.js`, `region.js`, `scripts/build-outline.mjs` → commit generated `public/data/amazon-biome.geojson`; unit tests (SPEC.md → Geometry, Seasons and years, Amazon outline). Blocker if `reference/amazon-limit/` is missing.
 - [ ] M1 review: fresh review subagent; summary here.
 
 ### M2 — Data pipeline (cloud)
-- [ ] 4. Evalscripts + `/api/imagery` proxy with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
+- [ ] 4. Evalscripts + `/api/imagery` proxy in `worker/imagery.js` with validation (incl. `window` and server-side `outside_amazon` check), server-chosen dates by zone, token cache, Cache API, MOCK mode, generated synthetic fixtures in `fixtures/mock/` (cloudy-base odd years); mocked-fetch tests. Falsecolor evalscript copied from `reference/` (blocker if missing).
 - [ ] 5. Client fetch + PNG decode with base → extended fallback, concurrency limit and progress callback; tests for the three fallback cases against MOCK responses.
 - [ ] M2 review.
 
@@ -35,7 +35,7 @@
 
 ### M5 — Live verification and launch (local)
 - [ ] 12. `[local]` Create `.dev.vars` (user pastes values), run `npm run dev:full`, run every acceptance check in SPEC.md → Verification (incl. north zone, outside rejection and a real fallback year), check the falsecolor tiles visually match training tiles, fix bugs (each fix a tested commit), write `docs/verification.md`.
-- [ ] 13. `[local]` Pre-deploy secret grep on `dist/`; merge `build` → `main`; confirm Cloudflare production deploy loads and completes one live run.
+- [ ] 13. `[local]` Pre-deploy secret grep on `dist/` and on `npx wrangler deploy --dry-run --outdir .wrangler-dry` output; merge `build` → `main`, which triggers the Workers Build; confirm the workers.dev URL loads and completes one live run; fill in the Worker URL in CLAUDE.md → Project values.
 - [ ] 14. ⏸️ Final hand-back: user checks the production site against the acceptance list and signs off.
 
 ## Milestone summaries
@@ -45,7 +45,7 @@
 - 2026-10-28: Amazon outline = RAISG Biomes 2025, Amazonía feature only (excludes Cerrado and Andes), rather than the broader RAISG Limits layer. Credit RAISG in the map attribution and model info panel.
 - 2026-10-28: `reference/build_dataset.py` fetches raw UINT16 bands (DN × 10000) and converts to 8-bit in Python (`to_rgb`: clip(GAIN × refl / 10000 × 255)). The falsecolor evalscript must reproduce that whole chain, including GAIN, not just the band order.
 - 2026-10-28: v2 `metadata.json`: labels ["Forest", "Not Forest"], imageSize 224. Test-tile expected predictions are in `fixtures/test_tiles/model_v2_predictions.csv` (eval.js output).
-- 2026-10-28: Hosting = Cloudflare Pages + Pages Functions (one project) rather than Vercel; keeps the site and the secret-holding proxy together.
+- 2026-10-28: Hosting = Cloudflare Pages + Pages Functions (one project) rather than Vercel; keeps the site and the secret-holding proxy together. *(Superseded below.)*
 - 2026-10-28: Model input is the v2 SWIR false-colour composite (B11/B8A/B04) at 128 px; labels read from metadata.json by name.
 - 2026-10-28: Area capped at 8 × 8 tiles (10.24 km side, 64 tiles).
 - 2026-10-28: Burn detection via dNBR > 0.27 using B12 (extra band); labelled "burn detected", not "fire clearing".
@@ -57,3 +57,4 @@
 - 2026-10-28: Cloud runs use MOCK mode only; every live CDSE call happens in `[local]` steps.
 - 2026-10-28: Session reconcile: git log = planning-files commit only; working tree has no code or user-supplied files. PROGRESS.md status (step 1 open) confirmed correct; run stopped at ⏸️ step 1.
 - 2026-10-28: Plain JS + Vite (no framework, no TypeScript) chosen for simplicity; change via a spec-change step before step 2 if wanted.
+- 2026-10-28: Hosting switched from Pages to a Worker with static assets, since Cloudflare created the project as a Worker. Cache API is a no-op on workers.dev.
