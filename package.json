@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",
+    "leaflet": "^1.9.4",
     "proj4": "^2.22.0"
   }
 }

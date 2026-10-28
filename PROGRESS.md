@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 8 — Map, search, status
-**Next step:** 9 — Report section
-**Last verified healthy:** 2026-10-28 after M3 review — `npm test` 111/111, `npm run build` OK
+**Current step:** 9 — Report section
+**Next step:** 10 — What the model sees
+**Last verified healthy:** 2026-10-28 after step 8 — `npm test` 119/119, `npm run build` OK, Chromium smoke check at 1280 and 375 px (no console errors, no horizontal scroll)
 
 ## Checklist
 
@@ -25,7 +25,7 @@
 - [x] M3 review.
 
 ### M4 — Interface (cloud)
-- [ ] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
+- [x] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
 - [ ] 9. Report section: run pipeline end to end in MOCK mode, chart with hollow extended-window points, year slider, true-colour view with date range, grid overlay, counts table incl. window column (`ui/report.js`, `main.js`).
 - [ ] 10. "What the model sees": false-colour view, tile inspector, model info panel, Known limitations (`ui/model-view.js`).
 - [ ] 11. Polish: loading/error/too-cloudy states, 375 px layout, keyboard access, pattern/icon markers.
@@ -85,3 +85,5 @@
 - 2026-10-28: Cover % and confidence use `Math.round(x × 10) / 10`. A tile's NBR is null if it has no valid pixels; then dNBR (and burn) is null/false.
 - 2026-10-28: Burn test is `dNBR > 0.27 + 1e-9`: exact-arithmetic `> 0.27` without float noise. NBR is quantised to 1/127.5 steps, so no real tile mean sits within 1e-9 above 0.27 except through rounding error.
 - 2026-10-28: `initBackend()` (caller runs it before `loadModel`) skips WebGL when `WEBGL_RENDER_FLOAT32_CAPABLE` is false, to keep probabilities near 0.5 faithful.
+- 2026-10-28: UI split: `ui/controls.js` (size select, zone label, Run, outside message) is separate from `ui/map.js` (Leaflet only), so the hard-limit behaviour is jsdom-testable. Outside the outline is dimmed with a world polygon that has the Amazon as a hole. The area square is yellow when inside, red when outside. A centre dot (circleMarker) avoids Leaflet's marker-icon asset paths under Vite.
+- 2026-10-28: Nominatim from the browser: submit-only, ≥ 1 s between requests (extra submits get a "wait" message), results greyed and disabled when `pointInAmazon` is false. No email or extra identifying parameters are sent.

@@ -3,12 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Year-by-year forest cover in the Amazon from Sentinel-2 dry-season images, classified in your browser." />
     <title>Amazon Forest Watch</title>
   </head>
   <body>
-    <main id="app">
+    <header class="site-header">
       <h1>Amazon Forest Watch</h1>
+      <p>Pick a place in the Amazon. The site fetches one dry-season Sentinel-2 image per year since 2017, cuts it into 1.28 km tiles, and a machine-learning model running in your browser labels each tile Forest or Not Forest.</p>
+    </header>
+    <main>
+      <section id="explore" class="explore" aria-labelledby="explore-title">
+        <h2 id="explore-title" class="visually-hidden">Choose an area</h2>
+        <aside class="panel" id="panel"></aside>
+        <div id="map" class="map" role="application" aria-label="Map of the Amazon. Click to choose the centre of the area."></div>
+      </section>
+      <section id="report" class="report" aria-labelledby="report-title" hidden></section>
+      <section id="model-view" class="model-view" aria-labelledby="model-title" hidden></section>
     </main>
+    <footer class="site-footer">
+      <p>Imagery: Copernicus Sentinel-2 (ESA), via the Copernicus Data Space Ecosystem. Amazon boundary © RAISG 2025. Map and search © OpenStreetMap contributors. A school AI/ML project.</p>
+    </footer>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
