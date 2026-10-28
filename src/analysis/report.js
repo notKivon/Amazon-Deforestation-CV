@@ -26,6 +26,8 @@ export function validTileShare(fractions) {
 }
 
 export const BURN_DNBR = 0.27; // burn detected if dNBR > 0.27 (strictly)
+// Float noise: a true dNBR of exactly 0.27 can compute as 0.27000000000000002.
+const EPS = 1e-9;
 export const FOREST_P = 0.5; // Forest if P(Forest) ≥ 0.5
 
 export const decodeNbr = (r) => r / 127.5 - 1;
@@ -65,12 +67,13 @@ export function buildReport(perYear) {
     }
 
     const tiles = valid.map((v, i) => {
-      if (!v || !probs[i]) return { valid: false, cls: null };
+      if (!v) return { valid: false, cls: null };
+      if (!probs[i]) throw new Error(`Tile ${i} of ${year} is valid but was not classified`);
       const forest = probs[i].pForest >= FOREST_P;
       const prev = last[i];
       const loss = !!prev && prev.forest && !forest;
       const dNbr = prev && prev.nbr != null && nbr[i] != null ? prev.nbr - nbr[i] : null;
-      const burn = dNbr != null && dNbr > BURN_DNBR;
+      const burn = dNbr != null && dNbr > BURN_DNBR + EPS;
       last[i] = { forest, nbr: nbr[i] };
       return {
         valid: true,
@@ -87,8 +90,7 @@ export function buildReport(perYear) {
     const forestCount = classified.filter((t) => t.cls === 'forest').length;
     return {
       ...base,
-      validCount: classified.length,
-      coverPct: classified.length ? round1((100 * forestCount) / classified.length) : null,
+      coverPct: round1((100 * forestCount) / classified.length),
       forestCount,
       notForestCount: classified.length - forestCount,
       lossCount: tiles.filter((t) => t.loss).length,

@@ -1,8 +1,8 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** M3 review
-**Next step:** 8 — Map, search, status
-**Last verified healthy:** 2026-10-28 after step 7 — `npm test` 107/107, `npm run build` OK
+**Current step:** 8 — Map, search, status
+**Next step:** 9 — Report section
+**Last verified healthy:** 2026-10-28 after M3 review — `npm test` 111/111, `npm run build` OK
 
 ## Checklist
 
@@ -22,7 +22,7 @@
 ### M3 — Model and analysis (cloud)  ∥B
 - [x] 6. ∥B (files: `src/model/*`, model tests) Model load, preprocessing, tile slicing, batch classify; parity test on `fixtures/test_tiles/` (≥ 140/143).
 - [x] 7. ∥B (files: `src/analysis/*`, analysis tests) Validity, NBR/dNBR, cover %, loss, burn flags; synthetic tests incl. 0.27 / 0.28 threshold.
-- [ ] M3 review.
+- [x] M3 review.
 
 ### M4 — Interface (cloud)
 - [ ] 8. Map with Amazon outline, hard limit (Run disabled outside), zone/window label, area size control, Nominatim search with outside results greyed out (`ui/map.js`, `ui/search.js`, `ui/status.js`); jsdom smoke tests.
@@ -41,6 +41,8 @@
 **M1 — Foundation (2026-10-28).** Scaffolded a Worker with static assets (`wrangler.jsonc`, `worker/index.js` routing, stub proxy), Vite 5, Vitest 3 + jsdom, and the cloud setup hook. Built UTM geometry, dry-season windows, available years, and the RAISG Amazon outline (1,999 vertices) with the centre + corners hard-limit check. Review confirmed all core rules (windows, 2.0° boundary, year cutoffs, EPSG, 10 m snapping, corners) and found no bugs; fixed its hardening items (`areaBox` rejects bad sizes/coordinates, `zoneFor` rejects non-numbers, outline script now counts features before dissolving). One review finding (stale Pages wording in CLAUDE.md) was a false positive — the reviewer read a pre-edit copy. Open: the outline ships twice (static file at the spec path + inlined in JS, 42 KB); Node 20 compatibility is untested here (the sandbox has Node 22).
 
 **M2 — Data pipeline (2026-10-28).** Built the three evalscripts (falsecolor bit-exact with the training `to_rgb` chain), the `/api/imagery` Worker proxy (strict validation, server-side Amazon check and dates, shared CDSE token cache, versioned silent Cache API, 502 mapping, procedural MOCK mode checked in workerd), and the client (nbr-first fetch, base → extended fallback, 3-request limiter, abort on first failure). Review confirmed the falsecolor chain, request shape, validation, and secrets handling. It found one real bug — the limiter leaked slots and hung later runs after any failure or abort — now fixed with regression tests. Also fixed: cache key versioned (`v1`), concurrent cold requests share one token request, and a `Content-Length` pre-check. Still open: Sentinel Hub float → UINT16 rounding (±1 DN at most), checked live in step 12.
+
+**M3 — Model and analysis (2026-10-28).** Model pipeline (labels by name, TM preprocessing, batch 16, valid tiles only) reproduces eval.js on the 143 held-out tiles: 141/143 correct, 143/143 agreement, probabilities within 0.001 — after finding empirically that eval.js resized with `alignCorners = true`. Analysis implements validity, cover %, loss and dNBR against the previous valid reported year, and burn flags. The review found no blocking bugs. Fixed: a true dNBR of 0.27 could compute as 0.27000000000000002 and be flagged (now compared with a 1e-9 margin, tested over all 255 encodings); tensors disposed on error (leak test added); a valid but unclassified tile now throws; clear metadata.json load error; WebGL without float32 falls back to CPU; scene-size check in `classifyScene`.
 
 ## Decisions & gotchas
 - 2026-10-28: Amazon outline = RAISG Biomes 2025, Amazonía feature only (excludes Cerrado and Andes), rather than the broader RAISG Limits layer. Credit RAISG in the map attribution and model info panel.
@@ -81,3 +83,5 @@
 - 2026-10-28: A stop-hook forced a mid-step save; it went to `wip/step-6` per CLAUDE.md, then was squashed onto `build` as one step commit. `wip/step-6` is left on origin (deleting it is the user's call).
 - 2026-10-28: "Previous valid year" for loss and dNBR = the tile's most recent earlier *reported* year in which it was valid. Too-cloudy (unreported) years carry no cover, tile classes, or flags, and are skipped when looking back, so a too-cloudy year never shows a loss. The first reported year has no loss or burn flags (nothing to compare).
 - 2026-10-28: Cover % and confidence use `Math.round(x × 10) / 10`. A tile's NBR is null if it has no valid pixels; then dNBR (and burn) is null/false.
+- 2026-10-28: Burn test is `dNBR > 0.27 + 1e-9`: exact-arithmetic `> 0.27` without float noise. NBR is quantised to 1/127.5 steps, so no real tile mean sits within 1e-9 above 0.27 except through rounding error.
+- 2026-10-28: `initBackend()` (caller runs it before `loadModel`) skips WebGL when `WEBGL_RENDER_FLOAT32_CAPABLE` is false, to keep probabilities near 0.5 faithful.

@@ -90,6 +90,21 @@ describe('buildReport', () => {
     expect(r[1].burnCount).toBe(1);
   });
 
+  it('dNBR of exactly 0.27 is never flagged, whatever the base NBR (float noise)', () => {
+    for (let a = 0; a <= 254; a++) {
+      const p = a / 127.5 - 1;
+      const r = buildReport([
+        year(2020, { validity: [1], probs: [F()], nbr: [p] }),
+        year(2021, { validity: [1], probs: [F()], nbr: [p - 0.27] }),
+      ]);
+      expect(r[1].tiles[0].burn).toBe(false);
+    }
+  });
+
+  it('throws if a valid tile in a reported year has no probabilities', () => {
+    expect(() => buildReport([year(2020, { validity: [1, 1], probs: [F(), null] })])).toThrow(/not classified/);
+  });
+
   it('labels loss with burn and reports confidence of the predicted class to 1 dp', () => {
     const r = buildReport([
       year(2020, { validity: [1, 1], probs: [F(0.97), F(0.5)], nbr: [0.6, 0.6] }),

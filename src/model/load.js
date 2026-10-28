@@ -6,6 +6,8 @@ export async function initBackend() {
     try {
       if (await tf.setBackend(name)) {
         await tf.ready();
+        // float16-only WebGL can shift probabilities near 0.5; use the CPU instead.
+        if (name === 'webgl' && !tf.env().getBool('WEBGL_RENDER_FLOAT32_CAPABLE')) continue;
         return name;
       }
     } catch {
@@ -30,7 +32,12 @@ export function readMetadata(metadata) {
  * metadata: the parsed metadata.json, or omitted to fetch it next to the model.
  */
 export async function loadModel({ source = '/model/model.json', metadata } = {}) {
-  const meta = metadata ?? (await (await fetch(new URL('metadata.json', new URL(source, location.href)))).json());
+  let meta = metadata;
+  if (!meta) {
+    const res = await fetch(new URL('metadata.json', new URL(source, location.href)));
+    if (!res.ok) throw new Error(`Could not load the model metadata (HTTP ${res.status})`);
+    meta = await res.json();
+  }
   const info = readMetadata(meta);
   const model = await tf.loadLayersModel(source);
   return { model, ...info };

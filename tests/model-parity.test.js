@@ -25,7 +25,7 @@ const rows = readFileSync('fixtures/test_tiles/model_v2_predictions.csv', 'utf8'
   .map(([trueClass, file, pF, pN, pred]) => ({ trueClass, file, pF: +pF, pN: +pN, pred }));
 
 describe('model parity (v2, 143 test tiles)', () => {
-  let probs;
+  let probs, leaked, smallScene;
 
   beforeAll(async () => {
     await tf.setBackend('cpu');
@@ -43,8 +43,17 @@ describe('model parity (v2, 143 test tiles)', () => {
       }
     }
     const grid = rows.map((_, i) => ({ row: 0, col: i }));
+    const before = tf.memory().numTensors;
     probs = await classifyScene(loaded, scene, grid);
+    leaked = tf.memory().numTensors - before;
+    smallScene = classifyScene(loaded, { width: 64, height: 64, data: new Uint8ClampedArray(64 * 64 * 4) }, grid.slice(0, 1));
   }, 600_000);
+
+  it('disposes every tensor it creates', () => expect(leaked).toBe(0));
+
+  it('rejects a scene smaller than the grid', async () => {
+    await expect(smallScene).rejects.toThrow(/smaller than the tile grid/);
+  });
 
   it('the manifest lists all 143 tiles', () => {
     const manifest = JSON.parse(readFileSync('fixtures/test_tiles/manifest.json', 'utf8'));
