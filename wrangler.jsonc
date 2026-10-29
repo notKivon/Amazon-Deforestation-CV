@@ -4,8 +4,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "amazon-deforestation-cv",
   "main": "worker/index.js",
-  // Latest date supported by the pinned wrangler 4.86.0 (last release that runs on Node 20).
-  "compatibility_date": "2026-04-26",
+  // Newest date supported by the workerd bundled with wrangler 4.155 (1.20261023).
+  "compatibility_date": "2026-10-23",
   // The Amazon outline is imported as text and parsed (same as the Vite plugin).
   "rules": [{ "type": "Text", "globs": ["**/*.geojson"], "fallthrough": true }],
   "assets": {
