@@ -4,6 +4,8 @@ import { TILE_COLOURS, SELECTED_COLOUR, LOSS_MARK, BURN_MARK } from './tiles.js'
 import { createViewer } from './viewer.js';
 import { windowFor } from '../geo/season.js';
 
+export const PLAY_STEP_MS = 1200;
+
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
 export function legend() {
@@ -13,7 +15,7 @@ export function legend() {
     h('li', {}, h('span', { class: 'swatch swatch-hatch' }), 'No data (cloud, shadow) — not counted'),
     h('li', {}, h('span', { class: 'mark' }, LOSS_MARK), 'Forest loss since the previous clear year'),
     h('li', {}, h('span', { class: 'mark' }, BURN_MARK), 'Burn detected (dNBR > 0.27)'),
-    h('li', {}, h('span', { class: 'swatch swatch-selected', style: { borderColor: SELECTED_COLOUR } }), 'Selected square (thin yellow outline)'),
+    h('li', {}, h('span', { class: 'swatch swatch-selected', style: { borderColor: SELECTED_COLOUR } }), 'Selected square (yellow outline)'),
   );
 }
 
@@ -34,6 +36,7 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
   const chartCanvas = h('canvas', { role: 'img', 'aria-label': `Line chart of forest cover by year. ${summary}` });
   const slider = h('input', { type: 'range', id: 'year-slider', min: 0, max: report.length - 1, step: 1, value: report.length - 1 });
   const yearLabel = h('output', { for: 'year-slider', class: 'year-label' });
+  const play = h('button', { type: 'button', class: 'play', 'aria-label': 'Play through the years' }, '▶ Play');
   const dates = h('p', { class: 'dates' });
   const gridToggle = h('input', { type: 'checkbox', id: 'grid-toggle', checked: true });
   const viewerBox = h('div', { class: 'viewer' });
@@ -53,7 +56,7 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
     h('p', { class: 'summary' }, summary),
     h('div', { class: 'chart-box' }, chartCanvas),
     h('p', { class: 'note' }, 'Filled points use the normal dry-season window. Hollow points are "extended window" years: the base window was too cloudy, so a window one month wider on each side was used. Gaps are years too cloudy to report.'),
-    h('div', { class: 'year-row' }, h('label', { for: 'year-slider' }, 'Year'), slider, yearLabel),
+    h('div', { class: 'year-row' }, h('label', { for: 'year-slider' }, 'Year'), play, slider, yearLabel),
     dates,
     h('label', { class: 'toggle' }, gridToggle, ' Show tile grid'),
     legend(),
@@ -87,9 +90,32 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
     rows.forEach((row, k) => row.classList.toggle('current', k === i));
     onYearChange(i);
   }
-  slider.addEventListener('input', () => show(Number(slider.value)));
+  // Play: step one year at a time and stop on the last year. Pressing Play on the last
+  // year starts again from the first; moving the slider by hand pauses.
+  let timer = null;
+  function pause() {
+    clearInterval(timer);
+    timer = null;
+    play.textContent = '▶ Play';
+    play.setAttribute('aria-label', 'Play through the years');
+  }
+  function step() {
+    const next = Number(slider.value) + 1;
+    if (next > report.length - 1) return pause();
+    slider.value = String(next);
+    show(next);
+    if (next === report.length - 1) pause();
+  }
+  play.addEventListener('click', () => {
+    if (timer) return pause();
+    if (Number(slider.value) >= report.length - 1) { slider.value = '0'; show(0); }
+    timer = setInterval(step, PLAY_STEP_MS);
+    play.textContent = '❚❚ Pause';
+    play.setAttribute('aria-label', 'Pause');
+  });
+  slider.addEventListener('input', () => { pause(); show(Number(slider.value)); });
   gridToggle.addEventListener('change', () => viewer.setGrid(gridToggle.checked));
   show(report.length - 1);
 
-  return { show, slider, viewer, get chart() { return chart; }, destroy: () => { destroyed = true; chart?.destroy(); } };
+  return { show, slider, viewer, get chart() { return chart; }, play, destroy: () => { destroyed = true; pause(); chart?.destroy(); } };
 }

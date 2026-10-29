@@ -15,8 +15,9 @@ export function scaleFor(sideKm) {
 }
 
 function scaleBar(sideKm) {
+  // Sits under the image (same width), so the bar's % width is true to scale.
   const { pct, label } = scaleFor(sideKm);
-  return h('div', { class: 'scale', 'aria-hidden': 'true' },
+  return h('div', { class: 'scale', role: 'img', 'aria-label': `Scale: the bar is ${label}. North is up.` },
     h('span', { class: 'north' }, 'N ↑'),
     h('span', { class: 'scale-bar', style: { width: `${pct}%` } }),
     h('span', { class: 'scale-label' }, label));
@@ -34,8 +35,8 @@ export function createViewer(container, { report, scenes, grid }) {
       ? 'True colour (what you would see)'
       : 'False colour (what the model sees)';
     const figure = h('figure', { class: 'scene-panel' },
-      h('div', { class: 'scene-wrap' }, canvas, scaleBar(sideKm)),
-      h('figcaption', {}, caption));
+      canvas,
+      h('figcaption', {}, h('span', {}, caption), scaleBar(sideKm)));
     return { product, canvas, figure };
   });
   const picker = h('select', { id: 'tile-picker' });

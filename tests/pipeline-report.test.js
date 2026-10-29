@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runPipeline } from '../src/app/pipeline.js';
-import { renderReport } from '../src/ui/report.js';
+import { renderReport, PLAY_STEP_MS } from '../src/ui/report.js';
 import { chartConfig } from '../src/ui/chart.js';
 
 const grid = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }];
@@ -81,6 +81,47 @@ describe('renderReport', () => {
     expect(section.querySelector('.dates').textContent).toMatch(/1 Jun 2023 to 31 Aug 2023/);
     expect(section.querySelector('tr.current th').textContent).toBe('2023');
     expect(createChart).toHaveBeenCalledOnce();
+  });
+});
+
+describe('renderReport play button', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<section id="report" hidden></section>';
+    HTMLCanvasElement.prototype.getContext = () => null;
+    vi.useFakeTimers();
+  });
+  afterEach(() => vi.useRealTimers());
+  const data = () => ({ report, scenes: report.map(() => ({ truecolor: blank, falsecolor: blank })), grid, zone: 'south' });
+
+  it('restarts from the first year at the end, steps each year, and stops on the last', () => {
+    const onYearChange = vi.fn();
+    const v = renderReport(document.getElementById('report'), data(), { onYearChange });
+    expect(v.slider.value).toBe('2');
+    v.play.click(); // at the last year → jumps to the first and plays
+    expect(v.slider.value).toBe('0');
+    expect(v.play.textContent).toMatch(/Pause/);
+    vi.advanceTimersByTime(PLAY_STEP_MS);
+    expect(v.slider.value).toBe('1');
+    vi.advanceTimersByTime(PLAY_STEP_MS);
+    expect(v.slider.value).toBe('2');
+    expect(v.play.textContent).toMatch(/Play/);
+    vi.advanceTimersByTime(PLAY_STEP_MS * 3);
+    expect(v.slider.value).toBe('2');
+    expect(onYearChange).toHaveBeenLastCalledWith(2);
+  });
+
+  it('pauses when pressed again or when the slider is moved by hand', () => {
+    const v = renderReport(document.getElementById('report'), data(), {});
+    v.play.click();
+    v.play.click();
+    vi.advanceTimersByTime(PLAY_STEP_MS * 2);
+    expect(v.slider.value).toBe('0');
+    v.play.click();
+    v.slider.value = '1';
+    v.slider.dispatchEvent(new Event('input'));
+    vi.advanceTimersByTime(PLAY_STEP_MS * 2);
+    expect(v.slider.value).toBe('1');
+    expect(v.play.textContent).toMatch(/Play/);
   });
 });
 

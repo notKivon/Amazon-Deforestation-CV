@@ -3,7 +3,8 @@
 import { TILE_PX } from '../geo/grid.js';
 
 export const TILE_COLOURS = { forest: '#00ff00', not_forest: '#ff0000' };
-export const SELECTED_COLOUR = '#ffd400';
+export const SELECTED_COLOUR = '#ffff00';
+const SELECT_W = 3; // selection outline width, in line units
 export const LOSS_MARK = '▼';
 export const BURN_MARK = '🔥';
 
@@ -37,15 +38,21 @@ export function drawScene(canvas, image, grid, yearReport, opts = {}) {
   if (opts.grid !== false && yearReport) drawGrid(ctx, grid, yearReport, u);
   const sel = opts.selected != null ? grid[opts.selected] : null;
   if (sel) {
+    // Yellow band on the outer edge, with a dark hairline inside it for contrast.
+    const x = sel.col * TILE_PX, y = sel.row * TILE_PX, w = SELECT_W * u;
     ctx.strokeStyle = SELECTED_COLOUR;
+    ctx.lineWidth = w;
+    ctx.strokeRect(x + w / 2, y + w / 2, TILE_PX - w, TILE_PX - w);
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
     ctx.lineWidth = u;
-    ctx.strokeRect(sel.col * TILE_PX + u / 2, sel.row * TILE_PX + u / 2, TILE_PX - u, TILE_PX - u);
+    ctx.strokeRect(x + w + u / 2, y + w + u / 2, TILE_PX - 2 * w - u, TILE_PX - 2 * w - u);
   }
 }
 
 function drawGrid(ctx, grid, yearReport, u) {
   const pattern = hatch(ctx);
-  const border = 2 * u, inset = u + border / 2;
+  // Class border sits inside the space reserved for the selection outline (+ hairline).
+  const border = 2 * u, inset = (SELECT_W + 1) * u + border / 2;
   ctx.font = `${Math.round(TILE_PX / 5)}px system-ui, sans-serif`;
   ctx.textBaseline = 'top';
   grid.forEach((t, i) => {
