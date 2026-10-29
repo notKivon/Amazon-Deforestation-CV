@@ -10,6 +10,10 @@
   // Explicit, so a deploy never flips the dashboard setting.
   "workers_dev": true,
   "preview_urls": true,
+  // Worker Previews (`npx wrangler preview`, Workers Builds' default Preview command) require
+  // this block. Empty: Previews use the top-level settings. Their Secrets are set separately
+  // (Previews Base); they do not inherit production Secrets.
+  "previews": {},
   // The Amazon outline is imported as text and parsed (same as the Vite plugin).
   "rules": [{ "type": "Text", "globs": ["**/*.geojson"], "fallthrough": true }],
   "assets": {
