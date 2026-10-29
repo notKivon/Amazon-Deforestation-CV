@@ -18,8 +18,10 @@ src/
   analysis/report.js   validity, cover %, loss, NBR/dNBR, burn flags (pure functions)
   ui/map.js            Leaflet map, click-to-select, area square + grid overlay
   ui/search.js         Nominatim search box
-  ui/report.js         chart, year slider, true-colour view, counts
-  ui/model-view.js     false-colour view, tile inspector, model info + limitations
+  ui/report.js         chart, year slider, scene viewer, counts
+  ui/viewer.js         true-colour and false-colour scenes side by side with tile grids and scale bars; shared tile selection
+  ui/inspector.js      selected-tile detail: both crops, confidence, P(Forest) / P(Not Forest), burn status
+  ui/model-view.js     "What the model sees" explanation, model info + limitations
   ui/status.js         loading / error / warning banners
 worker/index.js            Worker entry: POST /api/imagery → worker/imagery.js; everything else → env.ASSETS.fetch
 worker/imagery.js          Copernicus proxy (validation, token, cache, MOCK mode)
@@ -94,8 +96,10 @@ docs/verification.md       results of the [local] live verification
 ## UI
 - `ui/map.js`: Leaflet map centred on (−3.5, −60) zoom 5; attribution includes "Amazon boundary © RAISG 2025"; Amazon outline drawn as a light line with the area outside it dimmed; click sets centre; size control (select 2–8 tiles per side showing km); draws the area polygon (red and Run disabled with the "only covers the Amazon" message if `areaInsideAmazon` fails) and, after a run, a tile grid coloured by the selected year. Shows the zone and its base window under the controls (e.g. "North zone: dry season Dec–Mar").
 - `ui/search.js`: submit-only (no type-ahead) query to `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=…`; show up to 5 results; results outside the outline are greyed out with "outside the Amazon" and can't be chosen; choosing one recentres the map and sets the centre. At most one request per second; attribution "Search © OpenStreetMap contributors".
-- `ui/report.js`: Chart.js line chart (extended-window years drawn as hollow points, legend explains), year slider, true-colour image (scaled to fit, pixelated rendering off), image date range for the year shown, counts table (window / valid / forest / not forest / loss / burn).
-- `ui/model-view.js`: false-colour image with grid; click tile → inspector card with both crops at 4× (`image-rendering: pixelated`), probabilities as bars, burn status; static model info panel and Known limitations text from CLAUDE.md.
+- `ui/report.js`: Chart.js line chart (extended-window years drawn as hollow points, legend explains), year slider, image date range for the year shown, scene viewer, counts table (window / valid / forest / not forest / loss / burn).
+- `ui/viewer.js`: the year's full true-colour image and false-colour image ("what the model sees") **side by side** (stacked on narrow screens), each with the tile grid and a **scale bar** (with north arrow) in the bottom-left corner. Images scaled to fit, smooth rendering. Clicking a tile on **either** image (or choosing it from a keyboard-reachable list) selects it on both (yellow inner ring) and opens the inspector.
+- `ui/inspector.js`: both 128 px crops at 4× (`image-rendering: pixelated`), the verdict with confidence, P(Forest) and P(Not Forest) as bars, and burn status (dNBR, with the wildfire/clearing caveat).
+- `ui/model-view.js`: "What the model sees" section: how the false-colour image is made, static model info panel, colour key, and Known limitations text from CLAUDE.md.
 - Responsive down to 375 px wide; keyboard-reachable controls; colours not the only carrier of meaning (grid uses pattern for invalid, icons for loss/burn).
 
 ## External service setup (all ⏸️ user actions, batched in step 1)
