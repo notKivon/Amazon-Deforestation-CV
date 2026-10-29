@@ -101,7 +101,7 @@ docs/verification.md       results of the [local] live verification
 ## External service setup (all ⏸️ user actions, batched in step 1)
 - **CDSE:** rotate the OAuth client secret (the old one has been pasted into chats). Keep the new ID/secret for Cloudflare and `.dev.vars` only.
 - **GitHub:** create the repo, commit the planning files to `main`, create branch `build`.
-- **Cloudflare Worker:** `amazon-deforestation-cv`, connected to the repo via Workers Builds; production branch `main`; build command `npm run build`; deploy command `npx wrangler deploy`; Secrets (Settings → Variables and Secrets, type Secret) `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node version from `.node-version` (22).
+- **Cloudflare Worker:** `amazon-deforestation-cv`, connected to the repo via Workers Builds; production branch `main`; build command `npm run build`; deploy command `npx wrangler deploy`; builds for non-production branches enabled (covers `build`), non-production deploy command `npx wrangler versions upload`; preview URLs enabled; Secrets (Settings → Variables and Secrets, type Secret) `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node version from `.node-version` (22).
 - **Claude Code cloud environment:** point at the repo; no secret environment variables; default network (npm + GitHub).
 - **Files to add to the repo** (commit to `main` before branching): `public/model/` (v2 TF.js export), `reference/build_dataset.py`, `fixtures/test_tiles/` (v2 `Images_128/test/` contents + `manifest.json`, and the eval.js predictions CSV if available), and `reference/amazon-limit/` containing one Amazon biome boundary file covering all nine countries (e.g. the biogeographic Amazon limit published by RAISG, as a shapefile .zip or GeoJSON). The cloud sandbox can't download it, so it must be in the repo.
 
@@ -114,11 +114,11 @@ docs/verification.md       results of the [local] live verification
 - Proxy: Vitest with mocked `fetch` (token caching, validation 400s, upstream 502, MOCK mode); never a live call in cloud.
 - Model: parity test above.
 - UI: jsdom smoke tests (modules mount, controls fire callbacks) + `npm run build`.
-- Live (step 12, `[local]`): run the acceptance locations below with real credentials and record results in `docs/verification.md`:
+- Live (step 12, `[local]`): the user runs the acceptance locations below on the preview URL of the latest `build` push (Worker Secrets, no `.dev.vars` needed) and reports results; record them, with the preview URL's version ID, in `docs/verification.md`. Preview URLs are public, like production, so don't share them beyond testing:
   - Frontier: Novo Progresso, Pará (centre −7.05, −55.42), 8 tiles per side → cover % shows a net decline 2017 → latest.
   - Control: Jaú National Park (centre −2.0, −62.0), 8 tiles per side → every reported year ≥ 90% cover.
   - Burn: pick one 2024 fire location near Lábrea (centre −7.26, −64.80) → at least one burn flag appears in 2024 or 2025, or record that none did.
   - North zone: Iwokrama Forest, Guyana (centre 4.50, −58.80), 8 tiles per side → requests use the Dec–Mar window; record how many years were reported, how many needed the extended window, and the cover range.
-  - Outside: Brasília (−15.79, −47.88) → Run disabled in the UI and a direct POST to `/api/imagery` returns 400 `outside_amazon`.
+  - Outside: Brasília (−15.79, −47.88) → Run disabled in the UI and a direct POST to `<preview URL>/api/imagery` returns 400 `outside_amazon`.
   - Fallback: record at least one real year where the extended window was used, with its valid-tile % before and after.
   - First full 8 × 8 run completes within 90 s. Repeat run (cached): best effort; only measured on a custom domain (the Cache API does nothing on `*.workers.dev`).

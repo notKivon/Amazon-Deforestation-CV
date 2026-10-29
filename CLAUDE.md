@@ -7,7 +7,8 @@ This file loads every session. Implementation detail is in **SPEC.md**; live bui
 ## Tech stack
 - Node 22 (set by the `.node-version` file, not by a variable), Vite 5, **plain JavaScript (ES modules), no TypeScript, no UI framework**.
 - Hosting: **Cloudflare Workers with static assets**, deployed by Workers Builds from Git. Worker name `amazon-deforestation-cv`. The Worker (`worker/`) holds the Copernicus proxy; the static site is served from `dist/` via the `ASSETS` binding. One Worker, one deploy. Use the current Wrangler major version.
-- `wrangler.jsonc` has: `name`, `main: "worker/index.js"`, a current `compatibility_date`, and `assets: { directory: "./dist", binding: "ASSETS", run_worker_first: ["/api/*"] }`. **No `vars` block, ever.**
+- `wrangler.jsonc` has: `name`, `main: "worker/index.js"`, a current `compatibility_date`, `workers_dev: true`, `preview_urls: true`, and `assets: { directory: "./dist", binding: "ASSETS", run_worker_first: ["/api/*"] }`. **No `vars` block, ever.**
+- Non-production branch builds: every push to `build` runs `npx wrangler versions upload`, which creates a **preview URL** (`<version>-amazon-deforestation-cv.<subdomain>.workers.dev`) using the Worker's Secrets, without changing production.
 - Map: Leaflet 1.9.x with OpenStreetMap tiles (attribution shown). Search: OSM Nominatim.
 - Projection: proj4 2.x (UTM maths for exact 10 m pixel grids).
 - Model: `@tensorflow/tfjs` 4.x in the browser; v2 Teachable Machine export in `public/model/` (`model.json`, `weights.bin`, `metadata.json`).
@@ -78,7 +79,7 @@ This file loads every session. Implementation detail is in **SPEC.md**; live bui
 
 ## Run environment
 - **Cloud** (Claude Code on the web) for most steps: plain agent, no orchestrator, no secrets. `/api/imagery` runs in `MOCK=1` mode against synthetic fixtures. Network: npm registry and GitHub only.
-- **Local** for steps tagged `[local]`: live CDSE calls via `npm run dev:full` with `.dev.vars`, and browser checks. Needs CDSE, Nominatim and OSM tile hosts.
+- **Local** for steps tagged `[local]`: live checks in the user's browser on the **preview URL** of the latest `build` push (CDSE credentials stay in the Worker's Secrets; nothing secret on the user's machine). The cloud sandbox can't reach workers.dev, CDSE, Nominatim or OSM tiles, so the user runs the checks and reports results; the agent fixes bugs (each fix a tested commit pushed to `build`, which makes a new preview URL). `npm run dev:full` with `.dev.vars` remains optional (e.g. `MOCK=1`).
 - Push to `origin build` at every checkpoint. Unfinished work at a stop goes on a pushed `wip/<step>` branch, never a commit on `build`.
 
 ## Autonomy

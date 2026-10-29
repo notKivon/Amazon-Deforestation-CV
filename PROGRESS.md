@@ -1,6 +1,6 @@
 # Amazon Forest Watch — Build Progress
 
-**Current step:** 12 — `[local]` live verification (cloud run stopped here: needs `.dev.vars` with real CDSE credentials and the user's machine)
+**Current step:** 12 — `[local]` live verification on a Workers Builds preview URL (cloud run stopped here: needs the user's dashboard setting and browser)
 **Next step:** 13 — `[local]` deploy
 **Last verified healthy:** 2026-10-29 after the Node 22 switch — clean `npm ci`, `npm test` 132/132, `npm run build` OK, `wrangler deploy --dry-run` OK, secret grep clean on `dist/` and `.wrangler-dry/` (binding names only), `wrangler dev` MOCK + Chromium cancel/rerun OK
 
@@ -32,7 +32,7 @@
 - [x] M4 review.
 
 ### M5 — Live verification and launch (local)
-- [ ] 12. `[local]` Create `.dev.vars` (user pastes values), run `npm run dev:full`, run every acceptance check in SPEC.md → Verification (incl. north zone, outside rejection and a real fallback year), check the falsecolor tiles visually match training tiles, fix bugs (each fix a tested commit), write `docs/verification.md`.
+- [ ] 12. `[local]` ⏸️ User enables non-production branch builds (deploy command `npx wrangler versions upload`) and preview URLs on the Worker, then opens the preview URL of the latest `build` push and runs every acceptance check in SPEC.md → Verification (incl. north zone, outside rejection and a real fallback year), check the falsecolor tiles visually match training tiles, fix bugs (each fix a tested commit), write `docs/verification.md`.
 - [ ] 13. `[local]` Pre-deploy secret grep on `dist/` and on `npx wrangler deploy --dry-run --outdir .wrangler-dry` output; merge `build` → `main`, which triggers the Workers Build; confirm the workers.dev URL loads and completes one live run; fill in the Worker URL in CLAUDE.md → Project values.
 - [ ] 14. ⏸️ Final hand-back: user checks the production site against the acceptance list and signs off.
 
@@ -102,3 +102,4 @@
 - 2026-10-28: Not Forest tiles are dashed (canvas and map) as well as crimson, so Forest / Not Forest doesn't rely on red/green alone. Unexpected errors show a generic sentence; details go to the console.
 - 2026-10-29: Spec change (user request): Node 20 → Node 22. Node 20 reached end-of-life on 2026-04-30 and current Wrangler requires Node ≥ 22. Supersedes the Wrangler 4.86.0 pin and the jsdom ^26 note above.
 - 2026-10-29: Node 22 switch done: `.node-version` = 22; `engines.node` ≥ 22.13.0; wrangler ^4.155.0 (no longer pinned); `compatibility_date` 2026-10-23 (newest its bundled runtime 1.20261023 supports); jsdom ^29.1.1 (jsdom 30 needs Node ≥ 22.22.2, and the exact 22.x patch Workers Builds installs isn't known). Vite stays 5 and Vitest 3.2 per the spec. Verified with a clean `npm ci` on Node 22.22.0, the full test suite, build, dry-run, and a `wrangler dev` MOCK browser run.
+- 2026-10-29: Spec change (user request): live verification (step 12) uses Workers Builds preview URLs for `build` (`npx wrangler versions upload`) instead of `.dev.vars` + `npm run dev:full`, so the CDSE credentials never leave the Worker's Secrets. `wrangler.jsonc` gets explicit `workers_dev: true` and `preview_urls: true`: when unset, Wrangler leaves preview URLs as the dashboard has them. Wrangler keeps Secrets on uploaded versions (`keepSecrets: true` in both `deploy` and `versions upload`).
