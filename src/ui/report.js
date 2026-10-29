@@ -1,6 +1,7 @@
-// Report section: cover chart, year slider, true-colour view with tile grid, counts table.
+// Report section: cover chart, year slider, side-by-side scene viewer, counts table.
 import { h } from './dom.js';
-import { drawScene, TILE_COLOURS, LOSS_MARK, BURN_MARK } from './tiles.js';
+import { TILE_COLOURS, SELECTED_COLOUR, LOSS_MARK, BURN_MARK } from './tiles.js';
+import { createViewer } from './viewer.js';
 import { windowFor } from '../geo/season.js';
 
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -8,10 +9,11 @@ const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numer
 export function legend() {
   return h('ul', { class: 'legend' },
     h('li', {}, h('span', { class: 'swatch', style: { borderColor: TILE_COLOURS.forest } }), 'Forest'),
-    h('li', {}, h('span', { class: 'swatch swatch-dashed', style: { borderColor: TILE_COLOURS.not_forest } }), 'Not Forest (dashed)'),
+    h('li', {}, h('span', { class: 'swatch', style: { borderColor: TILE_COLOURS.not_forest } }), 'Not Forest'),
     h('li', {}, h('span', { class: 'swatch swatch-hatch' }), 'No data (cloud, shadow) — not counted'),
     h('li', {}, h('span', { class: 'mark' }, LOSS_MARK), 'Forest loss since the previous clear year'),
     h('li', {}, h('span', { class: 'mark' }, BURN_MARK), 'Burn detected (dNBR > 0.27)'),
+    h('li', {}, h('span', { class: 'swatch swatch-selected', style: { borderColor: SELECTED_COLOUR } }), 'Selected square (thin yellow outline)'),
   );
 }
 
@@ -34,7 +36,7 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
   const yearLabel = h('output', { for: 'year-slider', class: 'year-label' });
   const dates = h('p', { class: 'dates' });
   const gridToggle = h('input', { type: 'checkbox', id: 'grid-toggle', checked: true });
-  const view = h('canvas', { class: 'scene', role: 'img' });
+  const viewerBox = h('div', { class: 'viewer' });
   const rows = report.map((r) => h('tr', {},
     h('th', { scope: 'row' }, r.year),
     h('td', {}, r.extended ? 'extended window' : 'base'),
@@ -54,8 +56,8 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
     h('div', { class: 'year-row' }, h('label', { for: 'year-slider' }, 'Year'), slider, yearLabel),
     dates,
     h('label', { class: 'toggle' }, gridToggle, ' Show tile grid'),
-    h('div', { class: 'scene-box' }, view),
     legend(),
+    viewerBox,
     h('p', { class: 'note' }, 'A burn flag cannot tell wildfire from fire used to clear land.'),
     h('div', { class: 'table-wrap' }, h('table', { class: 'counts' },
       h('caption', {}, 'Tile counts per year'),
@@ -64,6 +66,7 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
     )),
   );
   section.hidden = false;
+  const viewer = createViewer(viewerBox, { report, scenes, grid });
   // createChart may return the chart or a promise of it (lazy-loaded Chart.js).
   let chart = null, destroyed = false;
   Promise.resolve(createChart?.(chartCanvas, report)).then((c) => {
@@ -75,19 +78,18 @@ export function renderReport(section, data, { createChart, onYearChange = () => 
   });
 
   function show(i) {
-    const r = report[i], s = scenes[i];
+    const r = report[i];
     const w = windowFor(zone, r.year, r.window);
     yearLabel.textContent = `${r.year}${r.extended ? ' (extended window)' : ''}`;
     slider.setAttribute('aria-valuetext', `${r.year}${r.reported ? `, ${r.coverPct.toFixed(1)}% forest` : ', too cloudy'}`);
     dates.textContent = `Images from ${fmtDate(w.from)} to ${fmtDate(w.to)} (least-cloudy pixels in that window).${r.reported ? '' : ' Too cloudy to report this year.'}`;
-    view.setAttribute('aria-label', `True-colour image for ${r.year}: ${r.reported ? `${r.coverPct.toFixed(1)}% forest` : 'too cloudy'}.`);
-    drawScene(view, s.truecolor, grid, r.reported ? r : null, { grid: gridToggle.checked });
+    viewer.setYear(i);
     rows.forEach((row, k) => row.classList.toggle('current', k === i));
     onYearChange(i);
   }
   slider.addEventListener('input', () => show(Number(slider.value)));
-  gridToggle.addEventListener('change', () => show(Number(slider.value)));
+  gridToggle.addEventListener('change', () => viewer.setGrid(gridToggle.checked));
   show(report.length - 1);
 
-  return { show, slider, get chart() { return chart; }, destroy: () => { destroyed = true; chart?.destroy(); } };
+  return { show, slider, viewer, get chart() { return chart; }, destroy: () => { destroyed = true; chart?.destroy(); } };
 }

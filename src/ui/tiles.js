@@ -1,8 +1,9 @@
 // Draws a scene (ImageData) with the tile grid overlay on a canvas. Shared by the
-// true-colour report view and the false-colour model view.
+// true-colour and false-colour images in the report's side-by-side viewer.
 import { TILE_PX } from '../geo/grid.js';
 
-export const TILE_COLOURS = { forest: '#2d6a4f', not_forest: '#c9184a' };
+export const TILE_COLOURS = { forest: '#00ff00', not_forest: '#ff0000' };
+export const SELECTED_COLOUR = '#ffd400';
 export const LOSS_MARK = '▼';
 export const BURN_MARK = '🔥';
 
@@ -21,6 +22,10 @@ function hatch(ctx) {
 /**
  * canvas: target; image: ImageData-like; yearReport: buildReport() entry or null;
  * opts: { grid: true|false, selected: tile index or null }
+ *
+ * Each tile, from its edge inwards: a thin separator line (yellow when selected), then the
+ * class border (green Forest, red Not Forest). Line widths scale with the image size so
+ * they look about the same on screen for every area size.
  */
 export function drawScene(canvas, image, grid, yearReport, opts = {}) {
   canvas.width = image.width;
@@ -28,9 +33,19 @@ export function drawScene(canvas, image, grid, yearReport, opts = {}) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return; // no canvas support (tests)
   ctx.putImageData(new ImageData(new Uint8ClampedArray(image.data), image.width, image.height), 0, 0);
-  if (opts.grid === false || !yearReport) return;
+  const u = Math.max(1, image.width / 512); // one "line unit" in canvas pixels
+  if (opts.grid !== false && yearReport) drawGrid(ctx, grid, yearReport, u);
+  const sel = opts.selected != null ? grid[opts.selected] : null;
+  if (sel) {
+    ctx.strokeStyle = SELECTED_COLOUR;
+    ctx.lineWidth = u;
+    ctx.strokeRect(sel.col * TILE_PX + u / 2, sel.row * TILE_PX + u / 2, TILE_PX - u, TILE_PX - u);
+  }
+}
 
+function drawGrid(ctx, grid, yearReport, u) {
   const pattern = hatch(ctx);
+  const border = 2 * u, inset = u + border / 2;
   ctx.font = `${Math.round(TILE_PX / 5)}px system-ui, sans-serif`;
   ctx.textBaseline = 'top';
   grid.forEach((t, i) => {
@@ -41,26 +56,18 @@ export function drawScene(canvas, image, grid, yearReport, opts = {}) {
       ctx.fillRect(x, y, TILE_PX, TILE_PX);
       if (pattern) { ctx.fillStyle = pattern; ctx.fillRect(x, y, TILE_PX, TILE_PX); }
     } else {
-      // Not Forest is dashed as well as coloured, so the classes don't rely on colour alone.
       ctx.strokeStyle = TILE_COLOURS[tile.cls];
-      ctx.lineWidth = 6;
-      ctx.setLineDash(tile.cls === 'forest' ? [] : [14, 8]);
-      ctx.strokeRect(x + 3, y + 3, TILE_PX - 6, TILE_PX - 6);
-      ctx.setLineDash([]);
+      ctx.lineWidth = border;
+      ctx.strokeRect(x + inset, y + inset, TILE_PX - 2 * inset, TILE_PX - 2 * inset);
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000';
       ctx.fillStyle = '#fff';
-      if (tile.loss) { ctx.strokeText(LOSS_MARK, x + 12, y + 12); ctx.fillText(LOSS_MARK, x + 12, y + 12); }
-      if (tile.burn) ctx.fillText(BURN_MARK, x + TILE_PX - 38, y + 12);
+      if (tile.loss) { ctx.strokeText(LOSS_MARK, x + 10, y + 10); ctx.fillText(LOSS_MARK, x + 10, y + 10); }
+      if (tile.burn) ctx.fillText(BURN_MARK, x + TILE_PX - 36, y + 10);
     }
     ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 0.5, y + 0.5, TILE_PX - 1, TILE_PX - 1);
-    if (opts.selected === i) {
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(x + 4, y + 4, TILE_PX - 8, TILE_PX - 8);
-    }
+    ctx.lineWidth = u;
+    ctx.strokeRect(x + u / 2, y + u / 2, TILE_PX - u, TILE_PX - u);
   });
 }
 

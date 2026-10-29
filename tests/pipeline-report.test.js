@@ -63,7 +63,7 @@ describe('renderReport', () => {
     const section = document.getElementById('report');
     const onYearChange = vi.fn();
     const createChart = vi.fn(() => ({ destroy() {} }));
-    const scenes = report.map((r) => ({ year: r.year, truecolor: blank }));
+    const scenes = report.map((r) => ({ year: r.year, truecolor: blank, falsecolor: blank }));
     const v = renderReport(section, { report, scenes, grid, zone: 'south' }, { createChart, onYearChange });
     expect(section.hidden).toBe(false);
     expect(section.querySelector('.summary').textContent).toBe('Forest cover went from 100.0% in 2023 to 75.0% in 2025 (-25.0 points).');
@@ -89,7 +89,7 @@ describe('renderReport chart lifecycle', () => {
     document.body.innerHTML = '<section id="report" hidden></section>';
     HTMLCanvasElement.prototype.getContext = () => null;
   });
-  const data = () => ({ report, scenes: report.map(() => ({ truecolor: blank })), grid, zone: 'south' });
+  const data = () => ({ report, scenes: report.map(() => ({ truecolor: blank, falsecolor: blank })), grid, zone: 'south' });
 
   it('destroys a lazily loaded chart that arrives after destroy()', async () => {
     const chart = { destroy: vi.fn() };

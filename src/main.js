@@ -86,8 +86,7 @@ function showOnMap(grid, yearReport) {
   mapView.setGrid(grid.map((t, i) => {
     const tile = yearReport.reported ? yearReport.tiles[i] : null;
     const style = tile?.valid
-      ? { color: TILE_COLOURS[tile.cls], fillColor: TILE_COLOURS[tile.cls], fillOpacity: 0.25, weight: tile.loss ? 3 : 1.5,
-          dashArray: tile.cls === 'forest' ? null : '6 4' }
+      ? { color: TILE_COLOURS[tile.cls], fillColor: TILE_COLOURS[tile.cls], fillOpacity: 0.2, weight: tile.loss ? 3 : 1.5 }
       : { color: '#888', fillColor: '#555', fillOpacity: 0.35, dashArray: '4 4', weight: 1 };
     return { cornersLatLon: t.cornersLatLon, style, title: `${yearReport.year}: ${describeTile(tile)}` };
   }));
@@ -121,10 +120,10 @@ async function run() {
     state.result = { report, scenes, grid, zone, area };
     setStale(false);
     state.view?.destroy();
-    const modelView = renderModelView(document.getElementById('model-view'), state.result);
+    renderModelView(document.getElementById('model-view'));
     state.view = renderReport(document.getElementById('report'), state.result, {
       createChart: (canvas, r) => import('./ui/chart.js').then((m) => m.createChart(canvas, r)),
-      onYearChange: (i) => { if (!state.stale) showOnMap(grid, report[i]); modelView.setYear(i); },
+      onYearChange: (i) => { if (!state.stale) showOnMap(grid, report[i]); },
     });
     const reportedYears = report.filter((r) => r.reported).length;
     if (!reportedYears) status.show('warning', 'Every year was too cloudy for this area. Try a nearby spot.');
