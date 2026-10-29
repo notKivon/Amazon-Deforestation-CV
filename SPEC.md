@@ -26,7 +26,7 @@ worker/imagery.js          Copernicus proxy (validation, token, cache, MOCK mode
 shared/evalscripts.js      the three evalscripts (server-only import)
 shared/geo.js              re-exports grid, season, years and region modules for the Worker (the Worker imports the outline GeoJSON at bundle time)
 wrangler.jsonc             Worker config (name, main, compatibility_date, assets; no vars block)
-.node-version              `20` (sets the Node version for Workers Builds)
+.node-version              `22` (sets the Node version for Workers Builds)
 public/model/              v2 TF.js export (user-supplied)
 public/data/amazon-biome.geojson   simplified Amazon outline (generated in step 3 from reference/amazon-limit/)
 reference/                 build_dataset.py (or its evalscript) from the training repo (user-supplied)
@@ -101,7 +101,7 @@ docs/verification.md       results of the [local] live verification
 ## External service setup (all ⏸️ user actions, batched in step 1)
 - **CDSE:** rotate the OAuth client secret (the old one has been pasted into chats). Keep the new ID/secret for Cloudflare and `.dev.vars` only.
 - **GitHub:** create the repo, commit the planning files to `main`, create branch `build`.
-- **Cloudflare Worker:** `amazon-deforestation-cv`, connected to the repo via Workers Builds; production branch `main`; build command `npm run build`; deploy command `npx wrangler deploy`; Secrets (Settings → Variables and Secrets, type Secret) `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node version from `.node-version` (20).
+- **Cloudflare Worker:** `amazon-deforestation-cv`, connected to the repo via Workers Builds; production branch `main`; build command `npm run build`; deploy command `npx wrangler deploy`; Secrets (Settings → Variables and Secrets, type Secret) `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`; Node version from `.node-version` (22).
 - **Claude Code cloud environment:** point at the repo; no secret environment variables; default network (npm + GitHub).
 - **Files to add to the repo** (commit to `main` before branching): `public/model/` (v2 TF.js export), `reference/build_dataset.py`, `fixtures/test_tiles/` (v2 `Images_128/test/` contents + `manifest.json`, and the eval.js predictions CSV if available), and `reference/amazon-limit/` containing one Amazon biome boundary file covering all nine countries (e.g. the biogeographic Amazon limit published by RAISG, as a shapefile .zip or GeoJSON). The cloud sandbox can't download it, so it must be in the repo.
 

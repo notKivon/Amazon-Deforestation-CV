@@ -100,3 +100,4 @@
 - 2026-10-28: Mock scenes are flat synthetic colours, far outside the training data, so the model's verdicts on them mean nothing (it calls some mostly-pink mock tiles Forest). Model correctness is covered by the two parity checks, and real imagery by step 12.
 - 2026-10-28: Selection is frozen during a run (Cancel first). After a run, changing the centre or size keeps the results visible with a "previous area" note and stops drawing their grid on the map.
 - 2026-10-28: Not Forest tiles are dashed (canvas and map) as well as crimson, so Forest / Not Forest doesn't rely on red/green alone. Unexpected errors show a generic sentence; details go to the console.
+- 2026-10-29: Spec change (user request): Node 20 → Node 22. Node 20 reached end-of-life on 2026-04-30 and current Wrangler requires Node ≥ 22. Supersedes the Wrangler 4.86.0 pin and the jsdom ^26 note above.

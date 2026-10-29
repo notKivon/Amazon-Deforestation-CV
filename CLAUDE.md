@@ -5,7 +5,7 @@ A website for a school AI/ML project. The user picks a location in the Amazon (s
 This file loads every session. Implementation detail is in **SPEC.md**; live build status and "where to resume" is in **PROGRESS.md**. **Read all three at the start of every session.**
 
 ## Tech stack
-- Node 20 (set by the `.node-version` file, not by a variable), Vite 5, **plain JavaScript (ES modules), no TypeScript, no UI framework**.
+- Node 22 (set by the `.node-version` file, not by a variable), Vite 5, **plain JavaScript (ES modules), no TypeScript, no UI framework**.
 - Hosting: **Cloudflare Workers with static assets**, deployed by Workers Builds from Git. Worker name `amazon-deforestation-cv`. The Worker (`worker/`) holds the Copernicus proxy; the static site is served from `dist/` via the `ASSETS` binding. One Worker, one deploy. Use the current Wrangler major version.
 - `wrangler.jsonc` has: `name`, `main: "worker/index.js"`, a current `compatibility_date`, and `assets: { directory: "./dist", binding: "ASSETS", run_worker_first: ["/api/*"] }`. **No `vars` block, ever.**
 - Map: Leaflet 1.9.x with OpenStreetMap tiles (attribution shown). Search: OSM Nominatim.
