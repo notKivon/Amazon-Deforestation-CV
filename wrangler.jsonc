@@ -6,6 +6,10 @@
   "main": "worker/index.js",
   // Newest date supported by the workerd bundled with wrangler 4.155 (1.20261023).
   "compatibility_date": "2026-10-23",
+  // workers.dev for production, plus preview URLs for `build` (npx wrangler versions upload).
+  // Explicit, so a deploy never flips the dashboard setting.
+  "workers_dev": true,
+  "preview_urls": true,
   // The Amazon outline is imported as text and parsed (same as the Vite plugin).
   "rules": [{ "type": "Text", "globs": ["**/*.geojson"], "fallthrough": true }],
   "assets": {
